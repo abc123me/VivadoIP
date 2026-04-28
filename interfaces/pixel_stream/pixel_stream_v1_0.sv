@@ -47,34 +47,46 @@
 // DO NOT MODIFY THIS FILE.
 
 
-`ifndef one_way_spi_v1_0
-`define one_way_spi_v1_0
+`ifndef pixel_stream_v1_0
+`define pixel_stream_v1_0
 
-interface one_way_spi_v1_0();
-  logic SS_I;                                            // Slave Select Input
-  logic SS_O;                                            // Slave Select Output
-  logic SS_T;                                            // Slave Select Tri-State Control
-  logic SCK_I;                                           // SPI Clock Input
-  logic SCK_O;                                           // SPI Clock Output
-  logic SCK_T;                                           // SPI Clock Tri-State Control
-  logic IO0_I;                                           // IO0 Input Port
-  logic IO0_O;                                           // IO0 Output Port
-  logic IO0_T;                                           // IO0 Tri-State Control
+package parameter_structs;
+
+  typedef struct packed {
+      bit    portEnabled;
+      integer    portWidth;
+  }portConfig;
+
+  typedef struct packed {
+    // <typeName> <LogicalName> = {<enablement>, <width>}
+    portConfig pixel_data;
+  }pixel_stream_v1_0_port_configuration;
+
+  parameter pixel_stream_v1_0_port_configuration pixel_stream_v1_0_default_port_configuration = '{pixel_data:'{1, -1}};
+
+endpackage
+
+interface pixel_stream_v1_0 #(parameter_structs::pixel_stream_v1_0_port_configuration port_configuration)();
+  logic [port_configuration.pixel_data.portWidth-1:0] pixel_data;            // The pixel data
+  logic pixel_sync;                                                          // High when on the last pixel
+  logic core_clock;                                                          // The core clock for the framebuffer device
+  logic pixel_ready;                                                         // Pixel data for the current pixel should be asserted when low
+  logic core_clock_en;                                                       // Enables the core clock for the IP block
 
   modport MASTER (
-    input SS_I, SCK_I, IO0_I, 
-    output SS_O, SS_T, SCK_O, SCK_T, IO0_O, IO0_T
+    input pixel_sync, pixel_ready, 
+    output pixel_data, core_clock, core_clock_en
     );
 
   modport SLAVE (
-    input SS_I, SCK_I, IO0_I, 
-    output SS_O, SS_T, SCK_O, SCK_T, IO0_O, IO0_T
+    input pixel_data, core_clock, core_clock_en, 
+    output pixel_sync, pixel_ready
     );
 
   modport MONITOR (
-    input SS_I, SS_O, SS_T, SCK_I, SCK_O, SCK_T, IO0_I, IO0_O, IO0_T
+    input pixel_data, pixel_sync, core_clock, pixel_ready, core_clock_en
     );
 
-endinterface // one_way_spi_v1_0
+endinterface // pixel_stream_v1_0
 
 `endif

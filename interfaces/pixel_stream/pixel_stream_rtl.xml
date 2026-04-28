@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:abstractionDefinition xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <spirit:vendor>kn4hji.ddns.net</spirit:vendor>
+  <spirit:library>interface</spirit:library>
+  <spirit:name>pixel_stream_rtl</spirit:name>
+  <spirit:version>1.0</spirit:version>
+  <spirit:busType spirit:vendor="kn4hji.ddns.net" spirit:library="interface" spirit:name="pixel_stream" spirit:version="1.0"/>
+  <spirit:ports>
+    <spirit:port>
+      <spirit:logicalName>pixel_data</spirit:logicalName>
+      <spirit:description>The pixel data</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>pixel_sync</spirit:logicalName>
+      <spirit:description>High when on the last pixel</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>core_clock</spirit:logicalName>
+      <spirit:description>The core clock for the framebuffer device</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isClock>true</spirit:isClock>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>pixel_ready</spirit:logicalName>
+      <spirit:description>Pixel data for the current pixel should be asserted when low</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>core_clock_en</spirit:logicalName>
+      <spirit:description>Enables the core clock for the IP block</spirit:description>
+      <spirit:wire>
+        <spirit:qualifier>
+          <spirit:isData>true</spirit:isData>
+        </spirit:qualifier>
+        <spirit:onMaster>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+        </spirit:onMaster>
+        <spirit:onSlave>
+          <spirit:presence>required</spirit:presence>
+          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
+        </spirit:onSlave>
+      </spirit:wire>
+    </spirit:port>
+  </spirit:ports>
+</spirit:abstractionDefinition>
