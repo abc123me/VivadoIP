@@ -1,4 +1,4 @@
-# Vivado IP ![Gitea badge](http://192.168.1.10:30008/jeremiah/VivadoIP/actions/workflows/test.yml/badge.svg)
+# Vivado IP ![Gitea badge](http://192.168.1.10:30008/jeremiah/VivadoIP/actions/workflows/test-rtl.yml/badge.svg)
 
 This is a collection of my vivado IP
 
