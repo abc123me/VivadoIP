@@ -2,10 +2,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - rtl/**
+      - tests/**
   workflow_dispatch:
 
 jobs:
-  test:
+  test-rtl:
     runs-on: linux-amd64
     steps:
       - name: Checkout code
