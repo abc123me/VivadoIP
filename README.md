@@ -1,4 +1,4 @@
-# Vivado IP
+# Vivado IP ![Gitea badge](http://192.168.1.10:30008/jeremiah/VivadoIP/actions/workflows/test.yml/badge.svg)
 
 This is a collection of my vivado IP
 
@@ -25,3 +25,13 @@ Name               | Status | Description
 `bit_reverser.v`   | 🟩 | Swaps the bit order in each word (ie. MSB becomes LSB). This was done since I screwed up my board design.
 `axi_pixel_fifo.v` | 🟨 | Converts an AXI4 stream into a pixel stream, meanwhile buffering exactly one line of pixels
 `axi_sequencer.v`  | 🟥 | Meant to be used with `axi_pixel_fifo.v`, this IP block sequences writes to a singular AXI stream into multiple pixel FIFOs
+
+## Unit testing
+
+Unit testing is done using `verilator` and `act`, I only run automated tests on my local git infrastructure and do not use GitHub actions
+
+You can test yourself by running the following:
+```
+sudo pacman -S verilator act
+./test.sh
+```
