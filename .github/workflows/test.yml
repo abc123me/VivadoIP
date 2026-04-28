@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: linux-amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile verilog modules
+        run:  |
+              verilator --binary -j 0 -Wall rtl/bit_reverser/bit_reverser.v
+
+      - name: Test bit_reverser
+        run:  |
+              verilator --cc --exe --build -j 0 -Wall tests/bit_reverser.cpp rtl/bit_reverser/bit_reverser.v
+              obj_dir/Vbit_reverser
