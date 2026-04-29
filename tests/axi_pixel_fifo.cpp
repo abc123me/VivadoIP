@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 			break;
 
 		// Generate the pixel clock signals
-		if(top->core_clock_en && top->core_clock_out && i++ >= cycles_per_pixel) {
+		if(top->core_clock_en && top->core_clock && i++ >= cycles_per_pixel) {
 			iters = i = 0;
 			top->pixel_sync = pixel == 0 ? 1 : 0;
 			top->pixel_ready = !top->pixel_ready;
@@ -131,7 +131,7 @@ int test_init_block(Vaxi_pixel_fifo *top, int cnt, int ppc) {
 		// Evaluate the IP block
 		top->eval();
 		// Generate the pixel clock signals
-		if(top->core_clock_en && !top->core_clock_out && i++ >= ppc) {
+		if(top->core_clock_en && !top->core_clock && i++ >= ppc) {
 			top->pixel_sync = (pixel % cnt) == 0 ? 1 : 0;
 			top->pixel_ready = !top->pixel_ready;
 			if(top->pixel_ready) pixel++;
