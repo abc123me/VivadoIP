@@ -20,11 +20,11 @@ Use at your own risk
 ## RTL
 
 Name               | Status | Description
--------------------|----|--------------------------------------------------------------------------------------------------
-`gpio74hc595.v`    | 🟩 | Converts a verilog logic vector input into GPIOs driven via a shift-register based GPIO expander
-`bit_reverser.v`   | 🟩 | Swaps the bit order in each word (ie. MSB becomes LSB). This was done since I screwed up my board design.
-`axi_pixel_fifo.v` | 🟨 | Converts an AXI4 stream into a pixel stream, meanwhile buffering exactly one line of pixels
-`axi_sequencer.v`  | 🟥 | Meant to be used with `axi_pixel_fifo.v`, this IP block sequences writes to a singular AXI stream into multiple pixel FIFOs
+-------------------|--------|--------------------------------------------------------------------------------------------------
+`axi_sequencer.v`  | In use | Meant to be used with `axi_pixel_fifo.v`, this IP block sequences writes to a singular AXI stream into multiple pixel FIFOs
+`axi_pixel_fifo.v` | In use | Converts an AXI4 stream into a pixel stream, meanwhile buffering exactly one line of pixels
+`bit_reverser.v`   | Tests  | Swaps the bit order in each word (ie. MSB becomes LSB). This was done since I screwed up my board design.
+`gpio74hc595.v`    | Tests  | Converts a verilog logic vector input into GPIOs driven via a shift-register based GPIO expander
 
 ## Unit testing
 
