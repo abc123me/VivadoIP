@@ -1,4 +1,4 @@
-`timescale 10ns / 10ps
+`timescale 10ns / 1ns
 //////////////////////////////////////////////////////////////////////////////////
 // Company:        Lowe Contracting
 // Engineer:       Jeremiah Lowe
@@ -27,7 +27,7 @@ module axi_pixel_fifo # (
 		
 		// Pixel stream out
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream pixel_data" *)    output reg [15:0] pixel_data,
-		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream core_clock" *)    output wire core_clock_out,
+		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream core_clock" *)    output wire core_clock,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream core_clock_en" *) output reg  core_clock_en,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream pixel_ready" *)   input wire pixel_ready,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 m_pixel_stream pixel_sync" *)    input wire pixel_sync,
@@ -43,7 +43,7 @@ module axi_pixel_fifo # (
 	);
 
 	// Clock control
-	assign core_clock_out = s_axis_clock;
+	assign core_clock = s_axis_clock;
 
 	// FIFO data
 	reg [DATA_WIDTH-1:0] fifo [FIFO_SIZE:0];

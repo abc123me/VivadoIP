@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 10ns / 1ns
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -36,7 +36,7 @@ module tft_ili9341_wrapper # (
 		// Pixel stream in
         (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_data" *)    input  wire [PIXEL_WIDTH-1:0] pixel_data,
         (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock" *)    input  wire core_clock,
-        (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock_en" *) input  wire core_clock_enable,
+        (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock_en" *) input  wire core_clock_en,
         (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_ready" *)   output wire pixel_ready,
         (* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_sync" *)    output reg  pixel_sync
 	);
@@ -77,7 +77,7 @@ module tft_ili9341_wrapper # (
 	tft_ili9341 # (
         .INPUT_CLK_MHZ(INPUT_CLK_MHZ) 
     ) (
-	   .clk(core_clock & core_clock_enable),
+	   .clk(core_clock & core_clock_en),
 	   .tft_sdo(tft_sdo),
 	   .tft_sck(tft_sck),
 	   .tft_sdi(tft_sda),

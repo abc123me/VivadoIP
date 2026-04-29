@@ -180,10 +180,6 @@ module pixel_fifo_sequencer # (
 	assign m15_axis_tvalid = s_axis_tvalid;
 	assign m15_axis_tlast  = s_axis_tlast;
 
-	reg tready;
-	initial tready = 0;
-	assign s_axis_tready = tready && global_ready;
-
 	reg [OUTPUT_CNT:0] state;
 	initial state = 0;
 
@@ -215,14 +211,14 @@ module pixel_fifo_sequencer # (
 	assign slave_tready   = treadies[state];
 	assign read_enables   = (!read_completes) & (16'b1 << state);
 
+	assign s_axis_tready = slave_tready && global_ready;
+
 	always @(negedge axis_clock) begin
 		if (state >= OUTPUT_CNT || !axis_aresetn) begin
 			state <= 0;
 		end else begin
-			tready <= slave_tready;
 			if (read_complete) begin
 				state <= state + 1;
-				tready <= 0;
 			end
 		end
 	end

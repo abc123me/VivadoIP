@@ -78,14 +78,16 @@ module tft_ili9341(
 				// initialize all pins in START mode; reset the LCD
 				START: begin
 					tft_reset <= 1'b0;
-					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10); // min: 10us
+					//remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10); // min: 10us
+					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10000); // min: 10ms
 					state <= HOLD_RESET;
 				end
 				
 				// wait for RESET to kick in; then release pin & wait for power up
 				HOLD_RESET: begin
 					tft_reset <= 1'b1; // release pin
-					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 120000); // min: 120ms
+					//remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 120000); // min: 120ms
+					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 200000); // min: 200ms
 					state <= WAIT_FOR_POWERUP;
 					frameBufferLowNibble <= 1'b0; // request first pixel
 				end
