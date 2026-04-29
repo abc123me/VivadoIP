@@ -17,6 +17,7 @@ jobs:
 
       - name: Compile verilog modules
         run:  |
+              verilator --version
               verilator --binary -j 0 -Wall rtl/bit_reverser/bit_reverser.v
               verilator --binary -j 0 -Wall rtl/gpio74hc595/gpio74hc595.v
 
