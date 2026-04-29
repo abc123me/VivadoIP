@@ -15,11 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Compile verilog modules
+      - name: Test axi_pixel_fifo
         run:  |
-              verilator --version
-              verilator --binary -j 0 -Wall rtl/bit_reverser/bit_reverser.v
-              verilator --binary -j 0 -Wall rtl/gpio74hc595/gpio74hc595.v
+              verilator --cc --exe --build -j 0 -Wall tests/axi_pixel_fifo.cpp rtl/axi_pixel_fifo/axi_pixel_fifo.v
+              obj_dir/Vaxi_pixel_fifo
 
       - name: Test bit_reverser
         run:  |
