@@ -5,6 +5,7 @@ on:
     paths:
       - rtl/**
       - tests/**
+      - .github/workflows/test-rtl.yml
   workflow_dispatch:
 
 jobs:
@@ -17,8 +18,14 @@ jobs:
       - name: Compile verilog modules
         run:  |
               verilator --binary -j 0 -Wall rtl/bit_reverser/bit_reverser.v
+              verilator --binary -j 0 -Wall rtl/gpio74hc595/gpio74hc595.v
 
       - name: Test bit_reverser
         run:  |
               verilator --cc --exe --build -j 0 -Wall tests/bit_reverser.cpp rtl/bit_reverser/bit_reverser.v
               obj_dir/Vbit_reverser
+
+      - name: Test gpio74hc595
+        run:  |
+              verilator --cc --exe --build -j 0 -Wall tests/gpio74hc595.cpp rtl/gpio74hc595/gpio74hc595.v
+              obj_dir/Vgpio74hc595
