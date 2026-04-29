@@ -33,5 +33,5 @@ Unit testing is done using `verilator` and `act`, I only run automated tests on 
 You can test yourself by running the following:
 ```
 sudo pacman -S verilator act
-./test.sh
+./test
 ```
