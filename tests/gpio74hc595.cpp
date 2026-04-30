@@ -1,9 +1,6 @@
 #include "Vgpio74hc595.h"
 
-#include "verilated.h"
-
-#include "stdint.h"
-#include "stdio.h"
+#include "test_base.h"
 
 #define SREG_ERR_OVERFLOW 1
 
@@ -38,7 +35,7 @@ int test_shift_val_out(Vgpio74hc595 *top, int wr_val, int rb_val, shift_reg_t *r
 	} else {
 		printf("FAIL (got = %08X, exp = %08X)\n", reg->ostate, rb_val);
 		print_chip(reg);
-		err = 1;
+		FAIL_TEST
 	}
 
 gtfo:

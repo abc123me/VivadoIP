@@ -1,9 +1,6 @@
 #include "Vaxi_pixel_fifo.h"
 
-#include "verilated.h"
-
-#include "stdio.h"
-#include "stdint.h"
+#include "test_base.h"
 
 int axi_send_data(Vaxi_pixel_fifo *top, uint16_t *data, int w, bool expect_read_complete, bool send_tlast);
 int test_init_block(Vaxi_pixel_fifo *top, int cnt, int ppc);
@@ -26,13 +23,12 @@ int main(int argc, char** argv) {
 
 	// Hold the block in reset for a bit and make sure it starts up normally
 	err = test_init_block(top, pixels, cycles_per_pixel);
-	if(err) goto gtfo;
+	CHCK_FAIL_OR_PASS
 
 	// Now that the IP is initialized, send some pixels
 	printf("Attempting to send %d pixels over AXI bus... ", w);
 	err = axi_send_data(top, idata, w, false, false);
-	if(err) goto gtfo;
-	puts("PASS");
+	CHCK_FAIL_OR_PASS
 
 	// Give a few dummy cycles to the IP block so the state machine does it's thing
 	top->pixel_ready = 1;
@@ -58,7 +54,7 @@ int main(int argc, char** argv) {
 			if(top->pixel_ready) {
 				if(top->pixel_data != idata[pixel]) {
 					printf("FAIL - Pixel data for pixel %d was invalid (got = %04X, exp = %04X)!\n", pixel, top->pixel_data, idata[pixel]);
-					if(pixel > 20) return 1;
+					FAIL_TEST
 				}
 				if(pixel++ >= pixels) pixel = 0;
 			}
@@ -68,7 +64,7 @@ int main(int argc, char** argv) {
 		// Make sure the loop exits
 		if(iters++ > 10000) {
 			printf("FAIL - Infinite loop detected!\n");
-			return 1;
+			FAIL_TEST
 		}
 	} while(1);
 	puts("PASS");
@@ -155,7 +151,6 @@ int test_init_block(Vaxi_pixel_fifo *top, int cnt, int ppc) {
 		return 1;
 	}
 
-	puts("PASS");
 	return 0;
 }
 void reset_block(Vaxi_pixel_fifo *top) {

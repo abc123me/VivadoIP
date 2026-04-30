@@ -1,8 +1,6 @@
 #include "Vbit_reverser.h"
 
-#include "verilated.h"
-
-#include "stdio.h"
+#include "test_base.h"
 
 int main(int argc, char** argv) {
 	int err = 0;
@@ -20,8 +18,7 @@ int main(int argc, char** argv) {
 			top->eval();
 			if (top->outp != exp_val) {
 				printf("FAIL, got = %08X (exp = %08X)!\n", top->outp, exp_val);
-				err = 1;
-				goto gtfo;
+				FAIL_TEST
 			} else puts("PASS");
 		}
 	}

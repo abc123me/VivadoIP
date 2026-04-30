@@ -8,6 +8,9 @@ on:
       - .github/workflows/test-rtl.yml
   workflow_dispatch:
 
+env:
+  VERILATOR_CMD: verilator --cc --exe --build -j 0 -Wall
+
 jobs:
   test-rtl:
     runs-on: linux-amd64
@@ -17,15 +20,15 @@ jobs:
 
       - name: Test axi_pixel_fifo
         run:  |
-              verilator --cc --exe --build -j 0 -Wall tests/axi_pixel_fifo.cpp rtl/axi_pixel_fifo/axi_pixel_fifo.v
+              $VERILATOR_CMD tests/axi_pixel_fifo.cpp rtl/axi_pixel_fifo/axi_pixel_fifo.v
               obj_dir/Vaxi_pixel_fifo
 
       - name: Test bit_reverser
         run:  |
-              verilator --cc --exe --build -j 0 -Wall tests/bit_reverser.cpp rtl/bit_reverser/bit_reverser.v
+              $VERILATOR_CMD tests/bit_reverser.cpp rtl/bit_reverser/bit_reverser.v
               obj_dir/Vbit_reverser
 
       - name: Test gpio74hc595
         run:  |
-              verilator --cc --exe --build -j 0 -Wall tests/gpio74hc595.cpp rtl/gpio74hc595/gpio74hc595.v
+              $VERILATOR_CMD tests/gpio74hc595.cpp rtl/gpio74hc595/gpio74hc595.v
               obj_dir/Vgpio74hc595
