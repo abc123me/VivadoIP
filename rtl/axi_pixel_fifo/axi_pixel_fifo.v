@@ -37,7 +37,6 @@ module axi_pixel_fifo # (
 		input wire s_axis_aresetn,
 		
 		// Miscellaneous
-		output reg  write_complete,
 		output reg  read_complete,
 		input  wire read_enable
 	);
@@ -79,7 +78,6 @@ module axi_pixel_fifo # (
 	task xfer_reset(); begin
 		fifo_out_pos <= 0;             // Reset the TX buffer position
 		fifo_in_pos <= 0;              // Reset the RX buffer position
-		write_complete <= 0;           // Clear the write complete flag
 		read_complete <= 0;            // Clear the read complete flag
 		pixel_clock_oneshot <= 1;      // Enable the pixel clock oneshot to buffer output data
 		s_axis_tready <= 1;            // We are ready for data so assert tready
@@ -186,7 +184,6 @@ module axi_pixel_fifo # (
 			end
 			STATE_TRANSFER_LAST: begin
 				if (!pixel_ready) begin
-					write_complete <= 1;    // Set the write complete flag now that we're done
 					core_clock_en <= 0;     // Disable pixel clock here since it's a bit unsure what should happen next
 					if (got_tlast && !pixel_sync) begin
 						state <= STATE_WAIT_PIXEL_SYNC;

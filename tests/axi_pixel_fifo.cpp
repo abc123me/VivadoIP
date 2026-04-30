@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 	do {
 		// Evaluate the IP block
 		top->eval();
-		if(top->write_complete)
+		if(top->s_axis_tready)
 			break;
 
 		// Generate the pixel clock signals
