@@ -4,7 +4,7 @@
 // Engineer:       Jeremiah Lowe
 // Create Date:    04/05/2026 12:52:58 PM
 // Design Name:    AXI FIFO Sequencer
-// Module Name:    axi_sequencer
+// Module Name:    axi_fifo_sequencer
 // Project Name:   Screen Hat
 // Target Devices: Any
 // Tool Versions:  Vivado 2025.2 and above
@@ -14,18 +14,16 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module pixel_fifo_sequencer # (
+module axi_fifo_sequencer # (
 		parameter DATA_WIDTH = 16,
 		parameter OUTPUT_CNT = 4
 	) (
 		// Miscellaneous signals
 		input  wire axis_clock,
 		input  wire axis_aresetn,
-		input  wire global_ready,
 
 		// FIFO Controls
-		output wire [OUTPUT_CNT-1:0] read_enables,
-		input  wire [OUTPUT_CNT-1:0] write_completes,
+		output reg  [OUTPUT_CNT-1:0] read_enables,
 		input  wire [OUTPUT_CNT-1:0] read_completes,
 
 		// AXI4 Streams out
@@ -113,7 +111,7 @@ module pixel_fifo_sequencer # (
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)  input  wire s_axis_tlast,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *) input  wire s_axis_tvalid,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TDATA" *)  input  wire [DATA_WIDTH-1:0] s_axis_tdata,
-		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output wire s_axis_tready
+		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output reg  s_axis_tready
 	);
 
 	assign m00_axis_tdata  = s_axis_tdata;
@@ -180,46 +178,44 @@ module pixel_fifo_sequencer # (
 	assign m15_axis_tvalid = s_axis_tvalid;
 	assign m15_axis_tlast  = s_axis_tlast;
 
-	reg [OUTPUT_CNT:0] state;
+	reg [3:0] state;
 	initial state = 0;
 
-	wire [OUTPUT_CNT-1:0] treadies;
-	assign treadies = {
-		m00_axis_tready,
-		m01_axis_tready,
-		m02_axis_tready,
-		m03_axis_tready,
-		m04_axis_tready,
-		m05_axis_tready,
-		m06_axis_tready,
-		m07_axis_tready,
-		m08_axis_tready,
-		m09_axis_tready,
-		m10_axis_tready,
-		m11_axis_tready,
-		m12_axis_tready,
-		m13_axis_tready,
-		m14_axis_tready,
-		m15_axis_tready
-	};
-
-	wire read_complete;
-	wire write_complete;
-	wire slave_tready;
-	assign read_complete  = read_completes[state];
-	assign write_complete = write_completes[state];
-	assign slave_tready   = treadies[state];
-	assign read_enables   = (!read_completes) & (16'b1 << state);
-
-	assign s_axis_tready = slave_tready && global_ready;
+	wire [15:0] treadies;
+	assign treadies[0] = m00_axis_tready;
+	assign treadies[1] = m01_axis_tready;
+	assign treadies[2] = m02_axis_tready;
+	assign treadies[3] = m03_axis_tready;
+	assign treadies[4] = m04_axis_tready;
+	assign treadies[5] = m05_axis_tready;
+	assign treadies[6] = m06_axis_tready;
+	assign treadies[7] = m07_axis_tready;
+	assign treadies[8] = m08_axis_tready;
+	assign treadies[9] = m09_axis_tready;
+	assign treadies[10] = m10_axis_tready;
+	assign treadies[11] = m11_axis_tready;
+	assign treadies[12] = m12_axis_tready;
+	assign treadies[13] = m13_axis_tready;
+	assign treadies[14] = m14_axis_tready;
+	assign treadies[15] = m15_axis_tready;
 
 	always @(negedge axis_clock) begin
-		if (state >= OUTPUT_CNT || !axis_aresetn) begin
-			state <= 0;
-		end else begin
-			if (read_complete) begin
-				state <= state + 1;
+		if(axis_aresetn) begin
+			if (state >= OUTPUT_CNT) begin
+				state <= 0;
+			end else begin
+				s_axis_tready <= treadies[state];
+				/* verilator lint_off WIDTHEXPAND */
+				/* verilator lint_off WIDTHTRUNC */
+				read_enables <= (~read_completes) & (16'b1 << state);
+				if (read_completes[state]) begin
+					state <= state + 1;
+				end
 			end
+		end else begin
+			s_axis_tready <= 0;
+			read_enables <= 0;
+			state <= 0;
 		end
 	end
 endmodule
