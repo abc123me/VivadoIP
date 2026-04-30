@@ -18,6 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Test axi_fifo_sequencer
+        run:  |
+              $VERILATOR_CMD tests/axi_fifo_sequencer.cpp rtl/axi_fifo_sequencer/axi_fifo_sequencer.v
+              obj_dir/Vaxi_fifo_sequencer
+
       - name: Test axi_pixel_fifo
         run:  |
               $VERILATOR_CMD tests/axi_pixel_fifo.cpp rtl/axi_pixel_fifo/axi_pixel_fifo.v
