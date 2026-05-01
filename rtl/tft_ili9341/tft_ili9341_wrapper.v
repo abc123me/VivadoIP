@@ -73,23 +73,18 @@ module tft_ili9341_wrapper # (
 		end
 	end
 
-	// Miscellaneous signal handling
-	wire tft_sdo;
-	assign tft_sdo = 0; // The SPI transcations are one way, the MOSI is unused
-
 	// ILI9341 driver IP, thanks to "thekroko" for making this!
 	// https://github.com/thekroko/ili9341_fpga/tree/master
 	tft_ili9341 # (
 		.INPUT_CLK_MHZ(INPUT_CLK_MHZ)
 	) tft (
 		.clk(core_clock & core_clock_en),
-		.tft_sdo(tft_sdo),
 		.tft_sck(tft_sck),
 		.tft_sdi(tft_sda),
 		.tft_dc(tft_dc),
 		.tft_reset(tft_nrst),
 		.tft_cs(tft_cs),
-		.framebufferData(pixel_data),
-		.framebufferClk(pixel_ready)
+		.pixel_data(pixel_data),
+		.pixel_ready(pixel_ready)
 	);
 endmodule
