@@ -1,5 +1,7 @@
 /** Simple frame-buffer based driver for the ILI9341 TFT module */
-module tft_ili9341(
+module tft_ili9341 # (
+		parameter INPUT_CLK_MHZ = 50
+	) (
 		input clk,
 		output wire tft_sck,
 		output wire tft_sdi,
@@ -10,27 +12,33 @@ module tft_ili9341(
 		output reg  pixel_ready
 	);
 
-	parameter INPUT_CLK_MHZ = 120; /* recommended */
-	
-	// Initial assignments
-	initial tft_reset = 1'b1;
-	initial pixel_ready = 1'b0;
+	// Delay constants
+	localparam DELAY_RESET = INPUT_CLK_MHZ * 10000;  // min: 10us  (changed to 10ms due to shift register delay)
+	localparam DELAY_POWER = INPUT_CLK_MHZ * 200000; // min: 120ms (changed to 200ms due to shift register delay)
+	localparam DELAY_INIT  = INPUT_CLK_MHZ * 5000;   // min: 5ms
+	localparam DELAY_READY = INPUT_CLK_MHZ * 10000;  // min: 10ms
+	localparam DELAY_PIXEL = 1;                      // probably not required, but I give the pixel data a clock cycle to settle
 
 	// Assign pins and modules
 	reg [15:0] pixel;
-	reg [8:0] spiData;
-	reg spiDataSet = 1'b0;
-	wire spiIdle;
+	reg [8:0]  spi_data;
+	reg spi_send;
+	wire spi_idle;
+
+	// Initial assignments
+	initial tft_reset = 1'b1;
+	initial pixel_ready = 1'b0;
+	initial spi_send = 1'b0;
 
 	tft_ili9341_spi spi(
 		.spiClk(clk), 
-		.data(spiData),
-		.dataAvailable(spiDataSet),
+		.data(spi_data),
+		.dataAvailable(spi_send),
 		.tft_sck(tft_sck),
 		.tft_sdi(tft_sdi),
 		.tft_dc(tft_dc),
 		.tft_cs(tft_cs),
-		.idle(spiIdle));
+		.idle(spi_idle));
 
 	// Init Sequence Data (based upon https://github.com/notro/fbtft/blob/master/fb_ili9341.c)
 	localparam INIT_SEQ_LEN = 52;
@@ -83,75 +91,71 @@ module tft_ili9341(
 
 	always @ (posedge clk) begin
 		// clear data flag first
-		spiDataSet <= 1'b0; 
+		spi_send <= 1'b0;
 
 		// always decrement delay ticks
 		if (remainingDelayTicks > 0) begin
 			remainingDelayTicks <= remainingDelayTicks - 1'b1;
-		end
-
-		else if (spiIdle && !spiDataSet) begin
+		end else if (spi_idle && !spi_send) begin
 			// advance state machine to next state, but only do this if we
 			// didn't just clock in the last byte (since idle is not yet updated)
 			case (state)
 				// initialize all pins in START mode; reset the LCD
 				STATE_START: begin
 					tft_reset <= 1'b0;
-					//remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10); // min: 10us
-					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10000); // min: 10ms
+					remainingDelayTicks <= DELAY_RESET;
 					state <= STATE_HOLD_RESET;
 				end
 
 				// wait for RESET to kick in; then release pin & wait for power up
 				STATE_HOLD_RESET: begin
 					tft_reset <= 1'b1; // release pin
-					//remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 120000); // min: 120ms
-					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 200000); // min: 200ms
+					remainingDelayTicks <= DELAY_POWER;
 					state <= STATE_WAIT_FOR_POWERUP;
 				end
 
 				// if power up is completed -> sw reset
 				STATE_WAIT_FOR_POWERUP: begin
-					spiData <= {1'b0, 8'h11}; // take out of sleep mode
-					spiDataSet <= 1'b1;
-					remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 5000); // min: 5ms
+					spi_data <= {1'b0, 8'h11}; // take out of sleep mode
+					spi_send <= 1'b1;
+					remainingDelayTicks <= DELAY_INIT;
 					state <= STATE_SEND_INIT_SEQ;
 				end
 
 				// setup the LCD by sending the init sequence
 				STATE_SEND_INIT_SEQ: begin
 					if (initSeqCounter < INIT_SEQ_LEN) begin
-						spiData <= INIT_SEQ[initSeqCounter];
-						spiDataSet <= 1'b1;
+						spi_data <= INIT_SEQ[initSeqCounter];
+						spi_send <= 1'b1;
 						initSeqCounter <= initSeqCounter + 1'b1;
 					end else begin
 						state <= STATE_ASSERT_PIXEL_READY;
-						remainingDelayTicks <= 24'(INPUT_CLK_MHZ * 10000); // min: 10ms
+						remainingDelayTicks <= DELAY_READY;
 					end
 				end
 
 				// frame buffer loop
 				STATE_ASSERT_PIXEL_READY: begin
-					pixel_ready <= 1;
-					remainingDelayTicks <= 1;
+					remainingDelayTicks <= DELAY_PIXEL;
 					state <= STATE_STORE_PIXEL_DATA;
+					pixel_ready <= 1;
 				end
 
 				STATE_STORE_PIXEL_DATA: begin
-					pixel_ready <= 0;
 					pixel <= pixel_data;
 					state <= STATE_SEND_UPPER_NIBBLE;
+					pixel_ready <= 0;
 				end
 
 				STATE_SEND_UPPER_NIBBLE: begin
-					spiData <= {1'b1, pixel[15:8]};
-					spiDataSet <= 1'b1;
+					spi_data <= {1'b1, pixel[15:8]};
+					spi_send <= 1'b1;
 					state <= STATE_SEND_LOWER_NIBBLE;
 				end
 
 				STATE_SEND_LOWER_NIBBLE: begin
-					spiData <= {1'b1, pixel[7:0]};
-					spiDataSet <= 1'b1;
+					spi_data <= {1'b1, pixel[7:0]};
+					spi_send <= 1'b1;
 					state <= STATE_ASSERT_PIXEL_READY;
 				end
 			endcase
