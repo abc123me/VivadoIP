@@ -20,7 +20,6 @@ module bit_reverser # (
 	input  wire [(WORD_SIZE * WORD_COUNT)-1:0] inp,
 	output wire [(WORD_SIZE * WORD_COUNT)-1:0] outp
 );
-
 	genvar w, b;
 	generate
 		for (w = 0; w < WORD_COUNT; w = w + 1) begin : word_loop
