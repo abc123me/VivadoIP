@@ -1,5 +1,18 @@
 `timescale 10ns / 1ns
-/** Simple frame-buffer based driver for the ILI9341 TFT module */
+//////////////////////////////////////////////////////////////////////////////////
+// Company:        Lowe Contracting
+// Engineer:       Jeremiah Lowe
+// Create Date:    05/02/2026 12:39:17 AM
+// Design Name:    Data
+// Module Name:    tft_ili9341
+// Project Name:   Screen Hat
+// Target Devices: Any
+// Tool Versions:  Vivado 2025.2 and above
+// Description:    ILI9341 TFT LCD display driver
+// Dependencies:   tft_ili9341_spi.v, tft_ili9341_init.v, bit_reverser.v
+// Revision:       1.0
+//////////////////////////////////////////////////////////////////////////////////
+
 module tft_ili9341 # (
 		parameter INPUT_CLK_MHZ = 50
 	) (

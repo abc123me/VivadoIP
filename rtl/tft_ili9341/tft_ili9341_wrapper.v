@@ -1,22 +1,16 @@
 `timescale 10ns / 1ns
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 03/31/2026 09:58:24 PM
-// Design Name: 
-// Module Name: tft_ili9341_wrapper
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
+// Company:        Lowe Contracting
+// Engineer:       Jeremiah Lowe
+// Create Date:    05/02/2026 12:39:17 AM
+// Design Name:    Data
+// Module Name:    tft_ili9341_wrapper
+// Project Name:   Screen Hat
+// Target Devices: Any
+// Tool Versions:  Vivado 2025.2 and above
+// Description:    Vivado wrapper block for the ILI9341
+// Dependencies:   tft_ili9341.v, tft_ili9341_spi.v, tft_ili9341_init.v, bit_reverser.v
+// Revision:       1.0
 //////////////////////////////////////////////////////////////////////////////////
 
 module tft_ili9341_wrapper # (
@@ -32,7 +26,7 @@ module tft_ili9341_wrapper # (
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:tftspi:1.0 m_tftspi nrst" *) output wire tft_nrst,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:tftspi:1.0 m_tftspi cs" *)   output wire tft_cs,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:tftspi:1.0 m_tftspi led" *)  output reg  tft_led,
-		
+
 		// Pixel stream in
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_data" *)    input  wire [PIXEL_WIDTH-1:0] pixel_data,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock" *)    input  wire core_clock,

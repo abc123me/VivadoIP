@@ -21,10 +21,11 @@ Use at your own risk
 
 Name               | Description
 -------------------|--------------------------------------------------------------------------------------------------
-`axi_sequencer.v`  | Meant to be used with `axi_pixel_fifo.v`, this IP block sequences writes to a singular AXI stream into multiple pixel FIFOs
-`axi_pixel_fifo.v` | Converts an AXI4 stream into a pixel stream, meanwhile buffering exactly one line of pixels
-`bit_reverser.v`   | Swaps the bit order in each word (ie. MSB becomes LSB). This was done since I screwed up my board design.
-`gpio74hc595.v`    | Converts a verilog logic vector input into GPIOs driven via a shift-register based GPIO expander
+`axi_sequencer`    | Meant to be used with `axi_pixel_fifo.v`, this IP block sequences writes to a singular AXI stream into multiple pixel FIFOs
+`axi_pixel_fifo`   | Converts an AXI4 stream into a pixel stream, meanwhile buffering exactly one line of pixels
+`bit_reverser`     | Swaps the bit order in each word (ie. MSB becomes LSB). This was done since I screwed up my board design.
+`gpio74hc595`      | Converts a verilog logic vector input into GPIOs driven via a shift-register based GPIO expander
+`tft_ili9341`      | Set of verilog files for driving the ILI9341 display, the core of the IP is located at `tft_ili9341_wrapper.v`
 
 ## Unit testing
 

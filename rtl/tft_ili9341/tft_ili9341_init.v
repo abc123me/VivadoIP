@@ -1,4 +1,17 @@
 `timescale 10ns / 1ns
+//////////////////////////////////////////////////////////////////////////////////
+// Company:        Lowe Contracting
+// Engineer:       Jeremiah Lowe
+// Create Date:    05/02/2026 12:39:17 AM
+// Design Name:    Data
+// Module Name:    tft_ili9341_init
+// Project Name:   Screen Hat
+// Target Devices: Any
+// Tool Versions:  Vivado 2025.2 and above
+// Description:    Initialization data for the ILI9341 display
+// Dependencies:   None
+// Revision:       1.0
+//////////////////////////////////////////////////////////////////////////////////
 
 module tft_ili9341_init (
 		input  wire       reset,
@@ -7,7 +20,7 @@ module tft_ili9341_init (
 		output wire [8:0] data
 	);
 
-	// Init Sequence Data (based upon https://github.com/notro/fbtft/blob/master/fb_ili9341.c)
+	// Init Sequence Data (based upon https://github.com/torvalds/linux/blob/master/drivers/staging/fbtft/fb_ili9341.c)
 	localparam INIT_SEQ_LEN = 52;
 	reg [8:0] INIT_SEQ [0:INIT_SEQ_LEN-1];
 
