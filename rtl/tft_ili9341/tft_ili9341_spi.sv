@@ -1,12 +1,13 @@
+`timescale 10ns / 1ns
 // --- Byte-wise SPI + DC implementation
 // * Will copy data into internal buffer
 // * 'Idle' will be set to 0 once buffer copy is complete
 // * Data is only copied if 'dataAvailable' is set to 1
 // * SPI CLK will stop (high state) if no data is being sent
 module tft_ili9341_spi(
-		input spiClk,
-		input[8:0] data,
-		input dataAvailable,
+		input  wire clk,
+		input  wire [8:0] data,
+		input  wire send,
 		output wire tft_sck,
 		output reg tft_sdi,
 		output reg tft_dc,
@@ -15,27 +16,37 @@ module tft_ili9341_spi(
 	);
 
 	// Registers
-	reg[0:2] counter = 3'b0;
-	reg[8:0] internalData;
+	reg[2:0] counter;
+	reg[8:0] idata;
 	reg internalSck;
 	reg cs;
 	
-	initial internalSck <= 1'b1;
-	initial idle <= 1'b1;
-	initial cs <= 1'b0;
+	initial internalSck = 1'b1;
+	initial counter = 3'b0;
+	initial idle = 1'b1;
+	initial cs = 1'b0;
 	
 	// Combinational Assignments
-	wire dataDc = internalData[8];
-	wire[0:7] dataShift = internalData[7:0]; // MSB first
+	wire dc;
+	wire[7:0] rdata;
+	assign rdata[7] = idata[0];
+	assign rdata[6] = idata[1];
+	assign rdata[5] = idata[2];
+	assign rdata[4] = idata[3];
+	assign rdata[3] = idata[4];
+	assign rdata[2] = idata[5];
+	assign rdata[1] = idata[6];
+	assign rdata[0] = idata[7];
+	assign dc = idata[8];
 	
 	assign tft_sck = internalSck & cs; // only drive sck with an active CS
 	assign tft_cs = !cs; // active low
 	
 	// Update SPI CLK + Output data
-	always @ (posedge spiClk) begin
+	always @ (posedge clk) begin
 		// Store new data in internal register
-		if (dataAvailable) begin
-			internalData <= data;
+		if (send) begin
+			idata <= data;
 			idle <= 1'b0;
 		end
 		
@@ -47,8 +58,8 @@ module tft_ili9341_spi(
 			// Check if SCK will be low next
 			if (internalSck) begin
 				// Update pins
-				tft_dc <= dataDc;
-				tft_sdi <= dataShift[counter];
+				tft_dc <= dc;
+				tft_sdi <= rdata[counter];
 				cs <= 1'b1;
 				
 				// Advance counter

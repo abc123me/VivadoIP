@@ -1,3 +1,4 @@
+`timescale 10ns / 1ns
 /** Simple frame-buffer based driver for the ILI9341 TFT module */
 module tft_ili9341 # (
 		parameter INPUT_CLK_MHZ = 50
@@ -31,9 +32,9 @@ module tft_ili9341 # (
 	initial spi_send = 1'b0;
 
 	tft_ili9341_spi spi(
-		.spiClk(clk), 
+		.clk(clk), 
 		.data(spi_data),
-		.dataAvailable(spi_send),
+		.send(spi_send),
 		.tft_sck(tft_sck),
 		.tft_sdi(tft_sdi),
 		.tft_dc(tft_dc),
@@ -42,10 +43,11 @@ module tft_ili9341 # (
 
 	// Init Sequence Data (based upon https://github.com/notro/fbtft/blob/master/fb_ili9341.c)
 	localparam INIT_SEQ_LEN = 52;
-	reg[5:0]  init_counter = 6'b0;
+	reg [5:0] init_counter;
 	reg [8:0] INIT_SEQ [0:INIT_SEQ_LEN-1];
 
 	initial begin
+		init_counter = 6'b0;
 		// Turn off Display
 		INIT_SEQ[0]  = {1'b0, 8'h28};
 		// Init (??)

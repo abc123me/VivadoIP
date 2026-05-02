@@ -44,7 +44,7 @@ module tft_ili9341_wrapper # (
 	localparam LAST_PIXEL = WIDTH * HEIGHT - 1;
 
 	// Backlight is turned on after first frame is drawn
-	initial tft_led <= 0;
+	initial tft_led = 0;
 
 	// Counter for outputting a pixel sync bit
 	reg [$clog2(LAST_PIXEL):0] pixel_counter;
