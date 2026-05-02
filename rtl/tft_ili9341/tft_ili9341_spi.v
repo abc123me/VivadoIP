@@ -18,30 +18,22 @@ module tft_ili9341_spi(
 	// Registers
 	reg[2:0] counter;
 	reg[8:0] idata;
-	reg internalSck;
+	reg sck;
 	reg cs;
-	
-	initial internalSck = 1'b1;
+
+	initial sck = 1'b1;
 	initial counter = 3'b0;
 	initial idle = 1'b1;
 	initial cs = 1'b0;
-	
+
 	// Combinational Assignments
 	wire dc;
 	wire[7:0] rdata;
-	assign rdata[7] = idata[0];
-	assign rdata[6] = idata[1];
-	assign rdata[5] = idata[2];
-	assign rdata[4] = idata[3];
-	assign rdata[3] = idata[4];
-	assign rdata[2] = idata[5];
-	assign rdata[1] = idata[6];
-	assign rdata[0] = idata[7];
+	bit_reverser # (.WORD_COUNT(1)) rev (.inp(idata[7:0]), .outp(rdata));
 	assign dc = idata[8];
-	
-	assign tft_sck = internalSck & cs; // only drive sck with an active CS
+	assign tft_sck = sck & cs; // only drive sck with an active CS
 	assign tft_cs = !cs; // active low
-	
+
 	// Update SPI CLK + Output data
 	always @ (posedge clk) begin
 		// Store new data in internal register
@@ -49,27 +41,28 @@ module tft_ili9341_spi(
 			idata <= data;
 			idle <= 1'b0;
 		end
-		
+
 		// Change data if we're actively sending
 		if (!idle) begin
 			// Toggle Clock on every active tick
-			internalSck <= !internalSck;
-				
+			sck <= !sck;
+
 			// Check if SCK will be low next
-			if (internalSck) begin
+			if (sck) begin
 				// Update pins
 				tft_dc <= dc;
 				tft_sdi <= rdata[counter];
 				cs <= 1'b1;
-				
+
 				// Advance counter
 				counter <= counter + 1'b1;
 				idle <= &counter; // we're just sending the last bit
 			end
-		end
-		else begin
-			internalSck <= 1'b1; // idle mode (also: sent last bit)
-			if (internalSck) cs <= 1'b0; // idle for two bits in a row -> deactivate CS
+		end else begin
+			sck <= 1'b1; // idle mode (also: sent last bit)
+			if (sck) begin
+				cs <= 1'b0; // idle for two bits in a row -> deactivate CS
+			end
 		end
 	end	
 endmodule

@@ -20,7 +20,7 @@ jobs:
 
       - name: Lint tft_ili9341
         run:  |
-              verilator --lint-only -j 0 -Wall rtl/tft_ili9341/*
+              verilator --lint-only -j 0 -Wall rtl/tft_ili9341/* rtl/bit_reverser/bit_reverser.v
 
       - name: Test axi_fifo_sequencer
         run:  |
