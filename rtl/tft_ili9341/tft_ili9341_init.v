@@ -16,12 +16,13 @@
 module tft_ili9341_init (
 		input  wire       reset,
 		input  wire       clock,
+		input  wire       enable,
 		output wire       done,
 		output wire [8:0] data
 	);
 
 	// Init Sequence Data (based upon https://github.com/torvalds/linux/blob/master/drivers/staging/fbtft/fb_ili9341.c)
-	localparam INIT_SEQ_LEN = 52;
+	localparam INIT_SEQ_LEN = 51; // 52;
 	reg [8:0] INIT_SEQ [0:INIT_SEQ_LEN-1];
 
 	initial begin
@@ -52,7 +53,7 @@ module tft_ili9341_init (
 		INIT_SEQ[43] = {1'b0, 8'hB7}; INIT_SEQ[44] = {1'b1, 8'h07};
 		INIT_SEQ[45] = {1'b0, 8'hB6}; INIT_SEQ[46] = {1'b1, 8'h0A}; INIT_SEQ[47] = {1'b1, 8'h82}; INIT_SEQ[48] = {1'b1, 8'h27}; INIT_SEQ[49] = {1'b1, 8'h00};
 		INIT_SEQ[50] = {1'b0, 8'h29}; // Enable Display
-		INIT_SEQ[51] = {1'b0, 8'h2C}; // Start Memory-Write
+		//INIT_SEQ[51] = {1'b0, 8'h2C}; // Start Memory-Write
 	end
 
 	reg [5:0] counter;
@@ -63,7 +64,7 @@ module tft_ili9341_init (
 	always @(posedge clock) begin
 		if (reset) begin
 			counter <= 6'b0;
-		end else begin
+		end else if(enable) begin
 			if (!done) begin
 				counter <= counter + 1'b1;
 			end
