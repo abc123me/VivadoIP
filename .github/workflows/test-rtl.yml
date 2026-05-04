@@ -18,6 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Test oneshot
+        run:  |
+              $VERILATOR_CMD tests/oneshot.cpp rtl/oneshot/oneshot.v
+              obj_dir/Voneshot
+
       - name: Lint tft_ili9341
         run:  |
               verilator --lint-only -j 0 -Wall rtl/tft_ili9341/* rtl/bit_reverser/bit_reverser.v
