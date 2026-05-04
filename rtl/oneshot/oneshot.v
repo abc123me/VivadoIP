@@ -13,21 +13,22 @@
 // Revision:       1.0
 //////////////////////////////////////////////////////////////////////////////////
 
-module oneshot # (
+module oneshot (
 		input  wire trigger,
 		input  wire reset,
-		output reg  oneshot
+		output reg  outp
 	);
 
 	wire signal;
 	assign signal = reset || trigger;
+	initial outp = 0;
 
 	always @(posedge signal) begin
 		if (trigger) begin
-			oneshot <= 1;
+			outp <= 1;
 		end
 		if (reset) begin
-			oneshot <= 0;
+			outp <= 0;
 		end
 	end
 endmodule
