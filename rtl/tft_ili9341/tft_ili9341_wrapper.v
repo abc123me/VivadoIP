@@ -32,7 +32,13 @@ module tft_ili9341_wrapper # (
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock" *)    input  wire core_clock,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream core_clock_en" *) input  wire core_clock_en,
 		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_ready" *)   output wire pixel_ready,
-		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_sync" *)    output reg  pixel_sync
+		(* X_INTERFACE_INFO = "kn4hji.ddns.net:interface:pixel_stream:1.0 s_pixel_stream pixel_sync" *)    output reg  pixel_sync,
+		
+		// Miscellaneous
+		input  wire io_ready,
+		output wire io_wait,
+		input  wire aresetn,
+		output wire ready
 	);
 
 	localparam LAST_PIXEL = WIDTH * HEIGHT - 1;
@@ -79,6 +85,10 @@ module tft_ili9341_wrapper # (
 		.tft_reset(tft_nrst),
 		.tft_cs(tft_cs),
 		.pixel_data(pixel_data),
-		.pixel_ready(pixel_ready)
+		.pixel_ready(pixel_ready),
+		.io_ready(io_ready),
+		.io_wait(io_wait),
+		.driver_resetn(aresetn),
+		.driver_ready(ready)
 	);
 endmodule
