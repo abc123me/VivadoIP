@@ -3,6 +3,7 @@
 #include "test_base.h"
 
 #include "init.h"
+#include "util.h"
 
 int main(int argc, char** argv) {
 	char err_str1[32], err_str2[32];

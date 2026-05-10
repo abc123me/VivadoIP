@@ -4,8 +4,6 @@
 #define INIT_SEQ_ENTRY(bit, val) ((bit << 8) | val)
 #define INIT_SEQ_LEN 52
 
-#define DATA_STR(val) (val & 0xFF), (val & 0x100 ? "w/ DC" : "w/o DC")
-
 const int INIT_SEQ[INIT_SEQ_LEN] = {
 	// Turn off Display
 	INIT_SEQ_ENTRY(0, 0x28),
