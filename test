@@ -1,1 +1,12 @@
-act -P linux-amd64=-self-hosted
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+echo act -P linux-amd64=-self-hosted "$@"
+act -P linux-amd64=-self-hosted "$@"
+
+ACT_CACHE="$HOME/.cache/act"
+if [ -d "$ACT_CACHE" ]; then
+	echo "Cleaning act cache!"
+	find "$ACT_CACHE" -maxdepth 1 -type d -mtime +1 -exec rm -rf {} \;
+fi
