@@ -55,17 +55,17 @@ module tft_ili9341_init (
 		INIT_SEQ[51] = {1'b0, 8'h2C}; // Start Memory-Write
 	end
 
-	reg [5:0] counter;
-	initial counter = 6'b0;
-	assign done = counter >= INIT_SEQ_LEN;
+	reg [$clog2(INIT_SEQ_LEN)-1:0] counter;
+	initial counter = 0;
 	assign data = INIT_SEQ[counter];
+	assign done = counter >= INIT_SEQ_LEN;
 
 	always @(posedge clock) begin
 		if (reset) begin
-			counter <= 6'b0;
+			counter <= 0;
 		end else begin
 			if (!done) begin
-				counter <= counter + 1'b1;
+				counter <= counter + 1;
 			end
 		end
 	end
