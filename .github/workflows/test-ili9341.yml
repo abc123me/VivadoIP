@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERILATOR_CMD: verilator --cc --exe --build -j 0 -Wall
+  VERILATOR_CMD: verilator --cc -CFLAGS "-I${PWD}/tests/include" --exe --build -j 0 -Wall
 
 jobs:
   test-rtl:
