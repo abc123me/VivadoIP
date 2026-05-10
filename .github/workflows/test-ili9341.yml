@@ -1,0 +1,22 @@
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - rtl/tft_ili9341/*
+      - tests/tft_ili9341/*
+      - .github/workflows/test-ili9341.yml
+  workflow_dispatch:
+
+env:
+  VERILATOR_CMD: verilator --cc --exe --build -j 0 -Wall
+
+jobs:
+  test-rtl:
+    runs-on: linux-amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint tft_ili9341
+        run:  verilator --lint-only -j 0 -Wall rtl/tft_ili9341/* rtl/bit_reverser/bit_reverser.v
