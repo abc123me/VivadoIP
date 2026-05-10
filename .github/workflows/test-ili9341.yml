@@ -21,6 +21,11 @@ jobs:
       - name: Lint tft_ili9341
         run:  verilator --lint-only -j 0 -Wall rtl/tft_ili9341/* -I rtl/bit_reverser/bit_reverser.v
 
+      - name: Test tft_ili9341_spi
+        run:  |
+              $VERILATOR_CMD tests/tft_ili9341/spi.cpp rtl/tft_ili9341/tft_ili9341_spi.v -I rtl/bit_reverser/bit_reverser.v --top-module tft_ili9341_spi
+              obj_dir/Vtft_ili9341_spi
+
       - name: Test tft_ili9341_init
         run:  |
               $VERILATOR_CMD tests/tft_ili9341/init.cpp rtl/tft_ili9341/tft_ili9341_init.v -I rtl/bit_reverser/bit_reverser.v --top-module tft_ili9341_init
