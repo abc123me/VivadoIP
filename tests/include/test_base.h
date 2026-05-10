@@ -6,9 +6,9 @@
 #include "stdio.h"
 #include "stdint.h"
 
-#define FAIL_MSG(fmt, ...) {              \
-	printf("FAIL - " fmt, ##__VA_ARGS__); \
-	FAIL_TEST                             \
+#define FAIL_MSG(fmt, ...) {                   \
+	printf("FAIL - " fmt "\n", ##__VA_ARGS__); \
+	FAIL_TEST                                  \
 }
 
 #define FAIL_TEST err = 1; goto gtfo;
