@@ -22,8 +22,9 @@ module tft_ili9341 # (
 		output wire tft_dc,
 		output reg  tft_reset,
 		output wire tft_cs,
-		input[15:0] pixel_data,
+		input  wire [15:0] pixel_data,
 		output reg  pixel_ready,
+		input  wire pixel_sync,
 		input  wire io_ready,
 		output reg  io_wait,
 		input  wire driver_resetn, // TODO
@@ -157,15 +158,15 @@ module tft_ili9341 # (
 					// Assert we're ready for a pixel
 					STATE_ASSERT_PIXEL_READY: begin
 						delay_counter <= DELAY_PIXEL;
-						state <= STATE_STORE_PIXEL_DATA;
 						pixel_ready <= 1;
+						state <= STATE_STORE_PIXEL_DATA;
 					end
 
 					// Store the pixel data into a register
 					STATE_STORE_PIXEL_DATA: begin
 						pixel <= pixel_data;
-						state <= STATE_SEND_UPPER_NIBBLE;
 						pixel_ready <= 0;
+						state <= STATE_SEND_UPPER_NIBBLE;
 					end
 
 					// Send the upper 4 bits
@@ -179,7 +180,11 @@ module tft_ili9341 # (
 					STATE_SEND_LOWER_NIBBLE: begin
 						spi_data <= {1'b1, pixel[7:0]};
 						spi_send <= 1'b1;
-						state <= STATE_ASSERT_PIXEL_READY;
+						if (pixel_sync) begin
+							state <= STATE_START_MEM_WRITE;
+						end else begin
+							state <= STATE_ASSERT_PIXEL_READY;
+						end
 					end
 
 					default: begin

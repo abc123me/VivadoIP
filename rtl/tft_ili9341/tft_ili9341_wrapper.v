@@ -51,7 +51,7 @@ module tft_ili9341_wrapper # (
 	initial pixel_counter = 0;
 
 	// The "pixel sync" is high whenever on the 0th pixel
-	// this allows extrernal IP to know when it can begin
+	// this allows external IP to know when it can begin
 	// providing pixel data to the IP block
 	initial pixel_sync = 1;
 
@@ -86,6 +86,7 @@ module tft_ili9341_wrapper # (
 		.tft_cs(tft_cs),
 		.pixel_data(pixel_data),
 		.pixel_ready(pixel_ready),
+		.pixel_sync(pixel_sync),
 		.io_ready(io_ready),
 		.io_wait(io_wait),
 		.driver_resetn(aresetn),
