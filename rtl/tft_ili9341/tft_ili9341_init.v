@@ -21,7 +21,8 @@ module tft_ili9341_init (
 	);
 
 	// Init Sequence Data (based upon https://github.com/torvalds/linux/blob/master/drivers/staging/fbtft/fb_ili9341.c)
-	localparam INIT_SEQ_LEN = 52;
+	// Another useful doc: https://github.com/adafruit/Adafruit_ILI9341/blob/master/Adafruit_ILI9341.cpp
+	localparam INIT_SEQ_LEN = 53;
 	reg [8:0] INIT_SEQ [0:INIT_SEQ_LEN-1];
 
 	initial begin
@@ -41,18 +42,18 @@ module tft_ili9341_init (
 		INIT_SEQ[29] = {1'b0, 8'hC5}; INIT_SEQ[30] = {1'b1, 8'h35}; INIT_SEQ[31] = {1'b1, 8'h3E};
 		INIT_SEQ[32] = {1'b0, 8'hC7}; INIT_SEQ[33] = {1'b1, 8'hBE};
 		// Memory Access Control
-		INIT_SEQ[34] = {1'b0, 8'h3A}; INIT_SEQ[35] = {1'b1, 8'h55};
+		INIT_SEQ[34] = {1'b0, 8'h3A}; INIT_SEQ[35] = {1'b1, 8'h55}; // 16 bit, 5-6-5 pixel format
+		INIT_SEQ[36] = {1'b0, 8'h36}; INIT_SEQ[37] = {1'b1, 8'h48}; // Flip RGB
 		// Frame Rate
-		INIT_SEQ[36] = {1'b0, 8'hB1}; INIT_SEQ[37] = {1'b1, 8'h00}; INIT_SEQ[38] = {1'b1, 8'h1B};
+		INIT_SEQ[38] = {1'b0, 8'hB1}; INIT_SEQ[39] = {1'b1, 8'h00}; INIT_SEQ[40] = {1'b1, 8'h1B}; // 70 FPS
 		// Gamma
-		INIT_SEQ[39] = {1'b0, 8'h26}; INIT_SEQ[40] = {1'b1, 8'h01};
+		INIT_SEQ[41] = {1'b0, 8'h26}; INIT_SEQ[42] = {1'b1, 8'h01};
 		// Brightness
-		INIT_SEQ[41] = {1'b0, 8'h51}; INIT_SEQ[42] = {1'b1, 8'hFF};
+		INIT_SEQ[43] = {1'b0, 8'h51}; INIT_SEQ[44] = {1'b1, 8'hFF};
 		// Display
-		INIT_SEQ[43] = {1'b0, 8'hB7}; INIT_SEQ[44] = {1'b1, 8'h07};
-		INIT_SEQ[45] = {1'b0, 8'hB6}; INIT_SEQ[46] = {1'b1, 8'h0A}; INIT_SEQ[47] = {1'b1, 8'h82}; INIT_SEQ[48] = {1'b1, 8'h27}; INIT_SEQ[49] = {1'b1, 8'h00};
-		INIT_SEQ[50] = {1'b0, 8'h29}; // Enable Display
-		INIT_SEQ[51] = {1'b0, 8'h2C}; // Start Memory-Write
+		INIT_SEQ[45] = {1'b0, 8'hB7}; INIT_SEQ[46] = {1'b1, 8'h07};
+		INIT_SEQ[47] = {1'b0, 8'hB6}; INIT_SEQ[48] = {1'b1, 8'h0A}; INIT_SEQ[49] = {1'b1, 8'h82}; INIT_SEQ[50] = {1'b1, 8'h27}; INIT_SEQ[51] = {1'b1, 8'h00};
+		INIT_SEQ[52] = {1'b0, 8'h29}; // Enable Display
 	end
 
 	reg [$clog2(INIT_SEQ_LEN)-1:0] counter;

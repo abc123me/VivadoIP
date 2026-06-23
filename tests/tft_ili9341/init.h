@@ -2,7 +2,7 @@
 #define _TFT_ILI9341_INIT_H
 
 #define INIT_SEQ_ENTRY(bit, val) ((bit << 8) | val)
-#define INIT_SEQ_LEN 52
+#define INIT_SEQ_LEN 53
 
 const int INIT_SEQ[INIT_SEQ_LEN] = {
 	// Turn off Display
@@ -22,6 +22,7 @@ const int INIT_SEQ[INIT_SEQ_LEN] = {
 	INIT_SEQ_ENTRY(0, 0xC7), INIT_SEQ_ENTRY(1, 0xBE),
 	// Memory Access Control
 	INIT_SEQ_ENTRY(0, 0x3A), INIT_SEQ_ENTRY(1, 0x55),
+	INIT_SEQ_ENTRY(0, 0x36), INIT_SEQ_ENTRY(1, 0x48),
 	// Frame Rate
 	INIT_SEQ_ENTRY(0, 0xB1), INIT_SEQ_ENTRY(1, 0x00), INIT_SEQ_ENTRY(1, 0x1B),
 	// Gamma
@@ -32,7 +33,6 @@ const int INIT_SEQ[INIT_SEQ_LEN] = {
 	INIT_SEQ_ENTRY(0, 0xB7), INIT_SEQ_ENTRY(1, 0x07),
 	INIT_SEQ_ENTRY(0, 0xB6), INIT_SEQ_ENTRY(1, 0x0A), INIT_SEQ_ENTRY(1, 0x82), INIT_SEQ_ENTRY(1, 0x27), INIT_SEQ_ENTRY(1, 0x00),
 	INIT_SEQ_ENTRY(0, 0x29), // Enable Display
-	INIT_SEQ_ENTRY(0, 0x2C), // Start Memory-Write
 };
 
 #endif

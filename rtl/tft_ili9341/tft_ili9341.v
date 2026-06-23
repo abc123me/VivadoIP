@@ -76,102 +76,119 @@ module tft_ili9341 # (
 	initial delay_counter = 24'b0;
 
 	// State machine for managing state
-	localparam STATE_START              = 3'b000;
-	localparam STATE_HOLD_RESET         = 3'b001;
-	localparam STATE_WAIT_FOR_POWERUP   = 3'b010;
-	localparam STATE_SEND_INIT_SEQ      = 3'b011;
-	localparam STATE_ASSERT_PIXEL_READY = 3'b100;
-	localparam STATE_STORE_PIXEL_DATA   = 3'b101;
-	localparam STATE_SEND_UPPER_NIBBLE  = 3'b110;
-	localparam STATE_SEND_LOWER_NIBBLE  = 3'b111;
-	reg [2:0] state;
+	localparam STATE_START              = 4'b0000;
+	localparam STATE_HOLD_RESET         = 4'b0001;
+	localparam STATE_WAIT_FOR_POWERUP   = 4'b0010;
+	localparam STATE_SEND_INIT_SEQ      = 4'b0011;
+	localparam STATE_ASSERT_PIXEL_READY = 4'b0100;
+	localparam STATE_STORE_PIXEL_DATA   = 4'b0101;
+	localparam STATE_SEND_UPPER_NIBBLE  = 4'b0110;
+	localparam STATE_SEND_LOWER_NIBBLE  = 4'b0111;
+	localparam STATE_START_MEM_WRITE    = 4'b1000;
+	reg [3:0] state;
 	initial state = STATE_START;
 
 	always @ (posedge clk) begin
 		if (driver_resetn) begin
-            // clear data flag first
-            spi_send <= 1'b0;
-    
-            if(io_wait && io_ready) begin
-                io_wait <= 1'b0;
-            end
-    
-            // always decrement delay ticks
-            if (delay_counter > 0) begin
-                if (!io_wait) begin
-                    delay_counter <= delay_counter - 1'b1;
-                end
-            end else if (spi_idle && !spi_send && !io_wait) begin
-                // advance state machine to next state, but only do this if we
-                // didn't just clock in the last byte (since idle is not yet updated)
-                case (state)
-                    // initialize all pins in START mode; reset the LCD
-                    STATE_START: begin
-                        tft_reset <= 1'b0;
-                        io_wait <= 1'b1;
-                        delay_counter <= DELAY_RESET;
-                        state <= STATE_HOLD_RESET;
-                    end
-    
-                    // wait for RESET to kick in; then release pin & wait for power up
-                    STATE_HOLD_RESET: begin
-                        tft_reset <= 1'b1; // release pin
-                        io_wait <= 1'b1;
-                        delay_counter <= DELAY_POWER;
-                        state <= STATE_WAIT_FOR_POWERUP;
-                    end
-    
-                    // if power up is completed -> sw reset
-                    STATE_WAIT_FOR_POWERUP: begin
-                        spi_data <= {1'b0, 8'h11}; // take out of sleep mode
-                        spi_send <= 1'b1;
-                        delay_counter <= DELAY_INIT;
-                        state <= STATE_SEND_INIT_SEQ;
-                    end
-    
-                    // setup the LCD by sending the init sequence
-                    STATE_SEND_INIT_SEQ: begin
-                        if (init_done) begin
-                            state <= STATE_ASSERT_PIXEL_READY;
-                            delay_counter <= DELAY_READY;
-                            driver_ready <= 1'b1;
-                        end else begin
-                            if(!init_clock) begin
-                                spi_data <= init_data;
-                                spi_send <= 1'b1;
-                            end
-                            init_clock <= !init_clock;
-                        end
-                    end
-    
-                    // frame buffer loop
-                    STATE_ASSERT_PIXEL_READY: begin
-                        delay_counter <= DELAY_PIXEL;
-                        state <= STATE_STORE_PIXEL_DATA;
-                        pixel_ready <= 1;
-                    end
-    
-                    STATE_STORE_PIXEL_DATA: begin
-                        pixel <= pixel_data;
-                        state <= STATE_SEND_UPPER_NIBBLE;
-                        pixel_ready <= 0;
-                    end
-    
-                    STATE_SEND_UPPER_NIBBLE: begin
-                        spi_data <= {1'b1, pixel[15:8]};
-                        spi_send <= 1'b1;
-                        state <= STATE_SEND_LOWER_NIBBLE;
-                    end
-    
-                    STATE_SEND_LOWER_NIBBLE: begin
-                        spi_data <= {1'b1, pixel[7:0]};
-                        spi_send <= 1'b1;
-                        state <= STATE_ASSERT_PIXEL_READY;
-                    end
-                endcase
-            end
-        end else begin
-            state <= STATE_START;
-        end
+			// clear data flag first
+			spi_send <= 1'b0;
+
+			if(io_wait && io_ready) begin
+				io_wait <= 1'b0;
+			end
+
+			// always decrement delay ticks
+			if (delay_counter > 0) begin
+				if (!io_wait) begin
+					delay_counter <= delay_counter - 1'b1;
+				end
+			end else if (spi_idle && !spi_send && !io_wait) begin
+				// advance state machine to next state, but only do this if we
+				// didn't just clock in the last byte (since idle is not yet updated)
+				case (state)
+					// initialize all pins in START mode; reset the LCD
+					STATE_START: begin
+						tft_reset <= 1'b0;
+						io_wait <= 1'b1;
+						delay_counter <= DELAY_RESET;
+						state <= STATE_HOLD_RESET;
+					end
+
+					// wait for RESET to kick in; then release pin & wait for power up
+					STATE_HOLD_RESET: begin
+						tft_reset <= 1'b1; // release pin
+						io_wait <= 1'b1;
+						delay_counter <= DELAY_POWER;
+						state <= STATE_WAIT_FOR_POWERUP;
+					end
+
+					// if power up is completed -> sw reset
+					STATE_WAIT_FOR_POWERUP: begin
+						spi_data <= {1'b0, 8'h11}; // take out of sleep mode
+						spi_send <= 1'b1;
+						delay_counter <= DELAY_INIT;
+						state <= STATE_SEND_INIT_SEQ;
+					end
+
+					// setup the LCD by sending the init sequence
+					STATE_SEND_INIT_SEQ: begin
+						if (init_done) begin
+							state <= STATE_START_MEM_WRITE;
+							delay_counter <= DELAY_READY;
+							driver_ready <= 1'b1;
+						end else begin
+							if(!init_clock) begin
+								spi_data <= init_data;
+								spi_send <= 1'b1;
+							end
+							init_clock <= !init_clock;
+						end
+					end
+
+					// FRAME BUFFER LOOP
+
+					STATE_START_MEM_WRITE: begin
+						state <= STATE_ASSERT_PIXEL_READY;
+						spi_data <= {1'b0, 8'h2C};
+						spi_send <= 1'b1;
+						pixel_ready <= 0;
+					end
+
+					// Assert we're ready for a pixel
+					STATE_ASSERT_PIXEL_READY: begin
+						delay_counter <= DELAY_PIXEL;
+						state <= STATE_STORE_PIXEL_DATA;
+						pixel_ready <= 1;
+					end
+
+					// Store the pixel data into a register
+					STATE_STORE_PIXEL_DATA: begin
+						pixel <= pixel_data;
+						state <= STATE_SEND_UPPER_NIBBLE;
+						pixel_ready <= 0;
+					end
+
+					// Send the upper 4 bits
+					STATE_SEND_UPPER_NIBBLE: begin
+						spi_data <= {1'b1, pixel[15:8]};
+						spi_send <= 1'b1;
+						state <= STATE_SEND_LOWER_NIBBLE;
+					end
+
+					// Send the lower 4 bits
+					STATE_SEND_LOWER_NIBBLE: begin
+						spi_data <= {1'b1, pixel[7:0]};
+						spi_send <= 1'b1;
+						state <= STATE_ASSERT_PIXEL_READY;
+					end
+
+					default: begin
+						state <= STATE_START;
+					end
+				endcase
+			end
+		end else begin
+			state <= STATE_START;
+		end
 	end
 endmodule
