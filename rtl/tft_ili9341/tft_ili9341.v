@@ -61,17 +61,17 @@ module tft_ili9341 # (
 		.tft_cs(tft_cs),
 		.idle(spi_idle));
 
-	reg init_clock;
+	reg init_resetn;
 	wire [8:0] init_data;
 	wire init_done;
 	tft_ili9341_init init(
-		.clock(init_clock),
-		.clock_enable(1),
-		.resetn(driver_resetn),
+		.clock(clk),
+		.clock_enable(spi_send),
+		.resetn(init_resetn),
 		.data(init_data),
 		.done(init_done));
 
-	initial init_clock = 1'b0;
+	initial init_resetn = 1'b0;
 
 	// state machine with delay + idle support (used for initialization)
 	reg[23:0] delay_counter;
@@ -112,6 +112,7 @@ module tft_ili9341 # (
 					STATE_START: begin
 						tft_reset <= 1'b0;
 						io_wait <= 1'b1;
+						init_resetn <= 1'b0;
 						delay_counter <= DELAY_RESET;
 						state <= STATE_HOLD_RESET;
 					end
@@ -128,6 +129,7 @@ module tft_ili9341 # (
 					STATE_WAIT_FOR_POWERUP: begin
 						spi_data <= {1'b0, 8'h11}; // take out of sleep mode
 						spi_send <= 1'b1;
+						init_resetn <= 1'b1;
 						delay_counter <= DELAY_INIT;
 						state <= STATE_SEND_INIT_SEQ;
 					end
@@ -139,11 +141,8 @@ module tft_ili9341 # (
 							delay_counter <= DELAY_READY;
 							driver_ready <= 1'b1;
 						end else begin
-							if(!init_clock) begin
-								spi_data <= init_data;
-								spi_send <= 1'b1;
-							end
-							init_clock <= !init_clock;
+							spi_data <= init_data;
+							spi_send <= 1'b1;
 						end
 					end
 
