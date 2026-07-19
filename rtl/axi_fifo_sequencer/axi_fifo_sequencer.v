@@ -201,14 +201,14 @@ module axi_fifo_sequencer # (
 
 	always @(negedge axis_clock) begin
 		if(axis_aresetn) begin
-			if (state >= OUTPUT_CNT) begin
-				state <= 0;
-			end else begin
-				s_axis_tready <= treadies[state];
-				/* verilator lint_off WIDTHEXPAND */
-				/* verilator lint_off WIDTHTRUNC */
-				read_enables <= (~read_completes) & (16'b1 << state);
-				if (read_completes[state]) begin
+			s_axis_tready <= treadies[state];
+			/* verilator lint_off WIDTHEXPAND */
+			/* verilator lint_off WIDTHTRUNC */
+			read_enables <= (~read_completes) & (16'b1 << state);
+			if (read_completes[state]) begin
+				if (state >= OUTPUT_CNT - 1) begin
+					state <= 0;
+				end else begin
 					state <= state + 1;
 				end
 			end
