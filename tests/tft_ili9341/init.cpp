@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
 	top->clock = 0;
 	top->clock_enable = 0;
-	top->reset = 1;
+	top->resetn = 0;
 	printf("Testing how the block reacts to reset being held w/o clock enable... ");
 	for(i = 0; i < 7; i++) {
 		top->eval();
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 	puts("PASS");
 
 	top->clock_enable = 0;
-	top->reset = 0;
+	top->resetn = 1;
 	printf("Testing how the block reacts to having clock w/o clock enable... ");
 	for(i = 0; i < 7; i++) {
 		top->eval();
@@ -36,7 +36,6 @@ int main(int argc, char** argv) {
 	puts("PASS");
 
 	printf("Testing if the init sequence is valid... ");
-	top->reset = 0;
 	top->clock = 0;
 	top->clock_enable = 1;
 	init_pos = 0;
