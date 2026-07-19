@@ -16,6 +16,7 @@
 module tft_ili9341_init (
 		input  wire       reset,
 		input  wire       clock,
+		input  wire       clock_enable,
 		output wire       done,
 		output wire [8:0] data
 	);
@@ -65,8 +66,10 @@ module tft_ili9341_init (
 		if (reset) begin
 			counter <= 0;
 		end else begin
-			if (!done) begin
-				counter <= counter + 1;
+			if(clock_enable) begin
+				if (!done) begin
+					counter <= counter + 1;
+				end
 			end
 		end
 	end

@@ -12,10 +12,22 @@ int main(int argc, char** argv) {
 	contextp->commandArgs(argc, argv);
 	Vtft_ili9341_init* top = new Vtft_ili9341_init{contextp};
 
-	top->reset = 1;
 	top->clock = 0;
-	printf("Testing how the block reacts to reset... ");
-	for(i = 0; i < 3; i++) {
+	top->clock_enable = 0;
+	top->reset = 1;
+	printf("Testing how the block reacts to reset being held w/o clock enable... ");
+	for(i = 0; i < 7; i++) {
+		top->eval();
+		top->clock = !top->clock;
+		if(top->data != INIT_SEQ[0])
+			FAIL_MSG("Block init data in reset state was incorrect")
+	}
+	puts("PASS");
+
+	top->clock_enable = 0;
+	top->reset = 0;
+	printf("Testing how the block reacts to having clock w/o clock enable... ");
+	for(i = 0; i < 7; i++) {
 		top->eval();
 		top->clock = !top->clock;
 		if(top->data != INIT_SEQ[0])
@@ -26,6 +38,7 @@ int main(int argc, char** argv) {
 	printf("Testing if the init sequence is valid... ");
 	top->reset = 0;
 	top->clock = 0;
+	top->clock_enable = 1;
 	init_pos = 0;
 	for(i = 0; i < INIT_SEQ_LEN * 3; i++) {
 		if(top->clock) init_pos++;

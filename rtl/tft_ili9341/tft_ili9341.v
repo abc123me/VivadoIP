@@ -66,6 +66,7 @@ module tft_ili9341 # (
 	wire init_done;
 	tft_ili9341_init init(
 		.clock(init_clock),
+		.clock_enable(1),
 		.reset(0),
 		.data(init_data),
 		.done(init_done));
