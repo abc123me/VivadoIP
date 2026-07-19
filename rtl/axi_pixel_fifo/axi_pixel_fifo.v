@@ -92,10 +92,6 @@ module axi_pixel_fifo # (
 		state <= STATE_INIT_FIRST_PIXEL;
 	end endtask
 
-	initial begin
-		hard_reset();
-	end
-
 	always @(posedge s_axis_clock) begin
 		// Handle the AXI peripheral reset
 		// this will bring the block to it's initial state
