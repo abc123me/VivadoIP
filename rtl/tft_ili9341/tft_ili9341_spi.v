@@ -15,6 +15,7 @@
 
 module tft_ili9341_spi(
 		input  wire clk,
+		input  wire clk_en,
 		input  wire [8:0] data,
 		input  wire send,
 		output wire tft_sck,
@@ -45,32 +46,34 @@ module tft_ili9341_spi(
 
 	// Update SPI CLK + Output data
 	always @ (posedge clk) begin
-		// Store new data in internal register
-		if (send) begin
-			idata <= data;
-			idle <= 1'b0;
-		end
-
-		// Change data if we're actively sending
-		if (!idle) begin
-			// Toggle Clock on every active tick
-			sck <= !sck;
-
-			// Check if SCK will be low next
-			if (sck) begin
-				// Update pins
-				tft_dc <= dc;
-				tft_sdi <= rdata[counter];
-				cs <= 1'b1;
-
-				// Advance counter
-				counter <= counter + 1'b1;
-				idle <= &counter; // we're just sending the last bit
+		if (clk_en) begin
+			// Store new data in internal register
+			if (send) begin
+				idata <= data;
+				idle <= 1'b0;
 			end
-		end else begin
-			sck <= 1'b1; // idle mode (also: sent last bit)
-			if (sck) begin
-				cs <= 1'b0; // idle for two bits in a row -> deactivate CS
+
+			// Change data if we're actively sending
+			if (!idle) begin
+				// Toggle Clock on every active tick
+				sck <= !sck;
+
+				// Check if SCK will be low next
+				if (sck) begin
+					// Update pins
+					tft_dc <= dc;
+					tft_sdi <= rdata[counter];
+					cs <= 1'b1;
+
+					// Advance counter
+					counter <= counter + 1'b1;
+					idle <= &counter; // we're just sending the last bit
+				end
+			end else begin
+				sck <= 1'b1; // idle mode (also: sent last bit)
+				if (sck) begin
+					cs <= 1'b0; // idle for two bits in a row -> deactivate CS
+				end
 			end
 		end
 	end	

@@ -78,7 +78,8 @@ module tft_ili9341_wrapper # (
 	tft_ili9341 # (
 		.INPUT_CLK_MHZ(INPUT_CLK_MHZ)
 	) tft (
-		.clk(core_clock & core_clock_en),
+		.clock(core_clock),
+		.clock_enable(core_clock_en),
 		.tft_sck(tft_sck),
 		.tft_sdi(tft_sda),
 		.tft_dc(tft_dc),
