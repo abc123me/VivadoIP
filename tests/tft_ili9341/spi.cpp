@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 	Vtft_ili9341_spi* top = new Vtft_ili9341_spi{contextp};
 
 	printf("Testing values in initial state... ");
-	top->clk = 0; top->data = 0; top->send = 0;
+	top->clk = 0; top->data = 0; top->send = 0; top->clk_en = 1;
 	CHECK_DEFAULT_OUTPUTS("Initial")
 	puts("PASS");
 
