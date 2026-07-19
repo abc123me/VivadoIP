@@ -17,14 +17,15 @@ module tft_ili9341_init (
 		input  wire       resetn,
 		input  wire       clock,
 		input  wire       clock_enable,
-		output wire       done,
+		output reg        done,
 		output wire [8:0] data
 	);
 
 	// Init Sequence Data (based upon https://github.com/torvalds/linux/blob/master/drivers/staging/fbtft/fb_ili9341.c)
 	// Another useful doc: https://github.com/adafruit/Adafruit_ILI9341/blob/master/Adafruit_ILI9341.cpp
 	localparam INIT_SEQ_LEN = 53;
-	reg [8:0] INIT_SEQ [0:INIT_SEQ_LEN-1];
+	localparam INIT_SEQ_END = INIT_SEQ_LEN - 1;
+	reg [8:0] INIT_SEQ [0:INIT_SEQ_END];
 
 	initial begin
 		// Turn off Display
@@ -60,17 +61,19 @@ module tft_ili9341_init (
 	reg [$clog2(INIT_SEQ_LEN)-1:0] counter;
 	initial counter = 0;
 	assign data = INIT_SEQ[counter];
-	assign done = counter >= INIT_SEQ_LEN;
 
 	always @(posedge clock) begin
 		if (resetn) begin
 			if(clock_enable) begin
-				if (!done) begin
+				if (counter < INIT_SEQ_END) begin
 					counter <= counter + 1;
+				end else begin
+					done <= 1;
 				end
 			end
 		end else begin
 			counter <= 0;
+			done <= 0;
 		end
 	end
 endmodule
