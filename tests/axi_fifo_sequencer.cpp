@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
 	}
 
 	top->read_completes = 0;
+	top->s_axis_tvalid = 1;
 	for (i = 0; i < 16; i++) {
 		int k = i % 4;
 		volatile auto *tready = &top->m00_axis_tready;
