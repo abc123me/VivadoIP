@@ -18,11 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Test oneshot
-        run:  |
-              $VERILATOR_CMD tests/oneshot.cpp rtl/oneshot/oneshot.v
-              obj_dir/Voneshot
-
       - name: Test axi_fifo_sequencer
         run:  |
               $VERILATOR_CMD tests/axi_fifo_sequencer.cpp rtl/axi_fifo_sequencer/axi_fifo_sequencer.v
@@ -38,7 +33,17 @@ jobs:
               $VERILATOR_CMD tests/bit_reverser.cpp rtl/bit_reverser/bit_reverser.v
               obj_dir/Vbit_reverser
 
+      - name: Test discrete_clock_converter
+        run:  |
+              $VERILATOR_CMD tests/discrete_clock_converter.cpp rtl/discrete_clock_converter/discrete_clock_converter.v
+              obj_dir/Vdiscrete_clock_converter
+
       - name: Test gpio74hc595
         run:  |
               $VERILATOR_CMD tests/gpio74hc595.cpp rtl/gpio74hc595/gpio74hc595.v
               obj_dir/Vgpio74hc595
+
+      - name: Test oneshot
+        run:  |
+              $VERILATOR_CMD tests/oneshot.cpp rtl/oneshot/oneshot.v
+              obj_dir/Voneshot
