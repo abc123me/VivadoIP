@@ -23,7 +23,7 @@ module axi_fifo_sequencer # (
 		input  wire axis_aresetn,
 
 		// FIFO Controls
-		output reg  [OUTPUT_CNT-1:0] read_enables,
+		output wire [OUTPUT_CNT-1:0] read_enables,
 		input  wire [OUTPUT_CNT-1:0] read_completes,
 
 		// AXI4 Streams out
@@ -111,9 +111,10 @@ module axi_fifo_sequencer # (
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)  input  wire s_axis_tlast,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *) input  wire s_axis_tvalid,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TDATA" *)  input  wire [DATA_WIDTH-1:0] s_axis_tdata,
-		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output reg  s_axis_tready,
+		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output wire s_axis_tready,
 
-		output reg [3:0] state
+		output reg [3:0] state,
+		output reg [7:0] tready_delay
 	);
 
 	assign m00_axis_tdata  = s_axis_tdata;
@@ -180,19 +181,17 @@ module axi_fifo_sequencer # (
 	assign m15_axis_tvalid = s_axis_tvalid;
 	assign m15_axis_tlast  = s_axis_tlast;
 
-	initial state = 0;
-
 	wire [15:0] treadies;
-	assign treadies[0] = m00_axis_tready;
-	assign treadies[1] = m01_axis_tready;
-	assign treadies[2] = m02_axis_tready;
-	assign treadies[3] = m03_axis_tready;
-	assign treadies[4] = m04_axis_tready;
-	assign treadies[5] = m05_axis_tready;
-	assign treadies[6] = m06_axis_tready;
-	assign treadies[7] = m07_axis_tready;
-	assign treadies[8] = m08_axis_tready;
-	assign treadies[9] = m09_axis_tready;
+	assign treadies[0]  = m00_axis_tready;
+	assign treadies[1]  = m01_axis_tready;
+	assign treadies[2]  = m02_axis_tready;
+	assign treadies[3]  = m03_axis_tready;
+	assign treadies[4]  = m04_axis_tready;
+	assign treadies[5]  = m05_axis_tready;
+	assign treadies[6]  = m06_axis_tready;
+	assign treadies[7]  = m07_axis_tready;
+	assign treadies[8]  = m08_axis_tready;
+	assign treadies[9]  = m09_axis_tready;
 	assign treadies[10] = m10_axis_tready;
 	assign treadies[11] = m11_axis_tready;
 	assign treadies[12] = m12_axis_tready;
@@ -200,26 +199,38 @@ module axi_fifo_sequencer # (
 	assign treadies[14] = m14_axis_tready;
 	assign treadies[15] = m15_axis_tready;
 
-	always @(negedge axis_clock) begin
-		if(axis_aresetn) begin
-			s_axis_tready <= treadies[state];
-			/* verilator lint_off WIDTHEXPAND */
-			/* verilator lint_off WIDTHTRUNC */
-			read_enables <= (~read_completes) & (16'b1 << state);
+	reg manual_resetn;
+
+	wire delayed_tready;
+	wire [DATA_WIDTH-1:0] cur_state_bit;
+	wire [DATA_WIDTH-1:0] inv_read_completes;
+	assign delayed_tready = tready_delay == 0 ? 1 : 0;
+	assign cur_state_bit = 16'b1 << state;
+	assign inv_read_completes = ~read_completes;
+	assign read_enables = inv_read_completes & cur_state_bit;
+	assign s_axis_tready = treadies[state] && inv_read_completes[state] && manual_resetn && delayed_tready;
+
+	always @(posedge axis_clock) begin
+		if(axis_aresetn && manual_resetn) begin
 			if (s_axis_tvalid) begin
-				if (read_completes[state]) begin
-					if (state >= OUTPUT_CNT - 1) begin
-						state <= 0;
-					end else begin
-						state <= state + 1;
-					end
+				if (read_completes[state] && delayed_tready) begin
+					state <= state >= OUTPUT_CNT - 1 ? 0 : state + 1;
+					tready_delay <= 10;
 				end
 			end else begin
 				state <= 0;
 			end
+
+			if (s_axis_tlast) begin
+				manual_resetn <= 0;
+			end
+
+			if (tready_delay > 0) begin
+				tready_delay <= tready_delay - 1;
+			end
 		end else begin
-			s_axis_tready <= 0;
-			read_enables <= 0;
+			manual_resetn <= 1;
+			tready_delay <= 10;
 			state <= 0;
 		end
 	end
