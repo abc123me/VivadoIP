@@ -16,6 +16,7 @@
 
 module axi_fifo_sequencer # (
 		parameter DATA_WIDTH = 16,
+		parameter XFER_COUNT = 240,
 		parameter OUTPUT_CNT = 4
 	) (
 		// Miscellaneous signals
@@ -111,9 +112,10 @@ module axi_fifo_sequencer # (
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)  input  wire s_axis_tlast,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *) input  wire s_axis_tvalid,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TDATA" *)  input  wire [DATA_WIDTH-1:0] s_axis_tdata,
-		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output reg  s_axis_tready,
+		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output wire s_axis_tready,
 
-		output reg [3:0] state
+		output reg [3:0] state,
+		output reg [$clog2(XFER_COUNT)-1:0] counter
 	);
 
 	assign m00_axis_tdata  = s_axis_tdata;
@@ -180,8 +182,6 @@ module axi_fifo_sequencer # (
 	assign m15_axis_tvalid = s_axis_tvalid;
 	assign m15_axis_tlast  = s_axis_tlast;
 
-	initial state = 0;
-
 	wire [15:0] treadies;
 	assign treadies[0] = m00_axis_tready;
 	assign treadies[1] = m01_axis_tready;
@@ -200,26 +200,40 @@ module axi_fifo_sequencer # (
 	assign treadies[14] = m14_axis_tready;
 	assign treadies[15] = m15_axis_tready;
 
-	always @(negedge axis_clock) begin
-		if(axis_aresetn) begin
+	reg tready_enable;
+	assign s_axis_tready = tready_enable && treadies[state] && s_axis_tvalid;
+	initial tready_enable = 0;
+
+	initial state = 0;
+	initial counter = 0;
+
+	reg reset_oneshot;
+	initial reset_oneshot = 1;
+
+	localparam LAST_OUTPUT = OUTPUT_CNT - 1;
+	localparam LAST_BYTE = XFER_COUNT - 1;
+
+	wire has_byte;
+	assign has_byte = s_axis_tvalid && s_axis_tready;
+
+	always @(posedge axis_clock) begin
+		if(axis_aresetn && reset_oneshot) begin
 			s_axis_tready <= treadies[state];
-			/* verilator lint_off WIDTHEXPAND */
-			/* verilator lint_off WIDTHTRUNC */
-			read_enables <= (~read_completes) & (16'b1 << state);
-			if (s_axis_tvalid) begin
-				if (read_completes[state]) begin
-					if (state >= OUTPUT_CNT - 1) begin
-						state <= 0;
-					end else begin
-						state <= state + 1;
-					end
-				end
+
+			if(counter >= LAST_BYTE) begin
+				state <= state < LAST_OUTPUT ? state + 1 : LAST_OUTPUT;
+				read_enables <= (~read_completes) & (16'b1 << state);
+				counter <= 0;
 			end else begin
-				state <= 0;
+				if(has_byte) begin
+					counter <= counter + 1;
+				end
 			end
 		end else begin
-			s_axis_tready <= 0;
+			reset_oneshot <= 1;
+			tready_enable <= 0;
 			read_enables <= 0;
+			counter <= 0;
 			state <= 0;
 		end
 	end
