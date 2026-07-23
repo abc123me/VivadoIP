@@ -205,12 +205,16 @@ module axi_fifo_sequencer # (
 			/* verilator lint_off WIDTHEXPAND */
 			/* verilator lint_off WIDTHTRUNC */
 			read_enables <= (~read_completes) & (16'b1 << state);
-			if (read_completes[state]) begin
-				if (state >= OUTPUT_CNT - 1) begin
-					state <= 0;
-				end else begin
-					state <= state + 1;
+			if (s_axis_tvalid) begin
+				if (read_completes[state]) begin
+					if (state >= OUTPUT_CNT - 1) begin
+						state <= 0;
+					end else begin
+						state <= state + 1;
+					end
 				end
+			end else begin
+				state <= 0;
 			end
 		end else begin
 			s_axis_tready <= 0;
