@@ -111,7 +111,9 @@ module axi_fifo_sequencer # (
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)  input  wire s_axis_tlast,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *) input  wire s_axis_tvalid,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TDATA" *)  input  wire [DATA_WIDTH-1:0] s_axis_tdata,
-		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output reg  s_axis_tready
+		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output reg  s_axis_tready,
+
+		output reg [3:0] state
 	);
 
 	assign m00_axis_tdata  = s_axis_tdata;
@@ -178,7 +180,6 @@ module axi_fifo_sequencer # (
 	assign m15_axis_tvalid = s_axis_tvalid;
 	assign m15_axis_tlast  = s_axis_tlast;
 
-	reg [3:0] state;
 	initial state = 0;
 
 	wire [15:0] treadies;
