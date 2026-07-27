@@ -200,6 +200,9 @@ module axi_fifo_sequencer # (
 	assign treadies[14] = m14_axis_tready;
 	assign treadies[15] = m15_axis_tready;
 
+	reg [OUTPUT_CNT-1:0] last_read_completes;
+	initial last_read_completes = 0;
+
 	always @(negedge axis_clock) begin
 		if(axis_aresetn) begin
 			s_axis_tready <= treadies[state];
@@ -207,7 +210,8 @@ module axi_fifo_sequencer # (
 			/* verilator lint_off WIDTHTRUNC */
 			read_enables <= (~read_completes) & (16'b1 << state);
 			if (s_axis_tvalid) begin
-				if (read_completes[state]) begin
+				if (read_completes != last_read_completes && read_completes[state]) begin
+					last_read_completes <= read_completes;
 					if (state >= OUTPUT_CNT - 1) begin
 						state <= 0;
 					end else begin
