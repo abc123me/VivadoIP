@@ -1,4 +1,4 @@
-`timescale 10ns / 1ns
+`timescale 1ns / 10ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company:        Lowe Contracting
 // Engineer:       Jeremiah Lowe
