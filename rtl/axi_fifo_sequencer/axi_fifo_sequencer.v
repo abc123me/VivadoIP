@@ -117,67 +117,67 @@ module axi_fifo_sequencer # (
 	);
 
 	assign m00_axis_tdata  = s_axis_tdata;
-	assign m00_axis_tvalid = s_axis_tvalid;
+	assign m00_axis_tvalid = s_axis_tvalid && state == 00;
 	assign m00_axis_tlast  = s_axis_tlast;
 
 	assign m01_axis_tdata  = s_axis_tdata;
-	assign m01_axis_tvalid = s_axis_tvalid;
+	assign m01_axis_tvalid = s_axis_tvalid && state == 01;
 	assign m01_axis_tlast  = s_axis_tlast;
 
 	assign m02_axis_tdata  = s_axis_tdata;
-	assign m02_axis_tvalid = s_axis_tvalid;
+	assign m02_axis_tvalid = s_axis_tvalid && state == 02;
 	assign m02_axis_tlast  = s_axis_tlast;
 
 	assign m03_axis_tdata  = s_axis_tdata;
-	assign m03_axis_tvalid = s_axis_tvalid;
+	assign m03_axis_tvalid = s_axis_tvalid && state == 03;
 	assign m03_axis_tlast  = s_axis_tlast;
 
 	assign m04_axis_tdata  = s_axis_tdata;
-	assign m04_axis_tvalid = s_axis_tvalid;
+	assign m04_axis_tvalid = s_axis_tvalid && state == 04;
 	assign m04_axis_tlast  = s_axis_tlast;
 
 	assign m05_axis_tdata  = s_axis_tdata;
-	assign m05_axis_tvalid = s_axis_tvalid;
+	assign m05_axis_tvalid = s_axis_tvalid && state == 05;
 	assign m05_axis_tlast  = s_axis_tlast;
 
 	assign m06_axis_tdata  = s_axis_tdata;
-	assign m06_axis_tvalid = s_axis_tvalid;
+	assign m06_axis_tvalid = s_axis_tvalid && state == 06;
 	assign m06_axis_tlast  = s_axis_tlast;
 
 	assign m07_axis_tdata  = s_axis_tdata;
-	assign m07_axis_tvalid = s_axis_tvalid;
+	assign m07_axis_tvalid = s_axis_tvalid && state == 07;
 	assign m07_axis_tlast  = s_axis_tlast;
 
 	assign m08_axis_tdata  = s_axis_tdata;
-	assign m08_axis_tvalid = s_axis_tvalid;
+	assign m08_axis_tvalid = s_axis_tvalid && state == 08;
 	assign m08_axis_tlast  = s_axis_tlast;
 
 	assign m09_axis_tdata  = s_axis_tdata;
-	assign m09_axis_tvalid = s_axis_tvalid;
+	assign m09_axis_tvalid = s_axis_tvalid && state == 09;
 	assign m09_axis_tlast  = s_axis_tlast;
 
 	assign m10_axis_tdata  = s_axis_tdata;
-	assign m10_axis_tvalid = s_axis_tvalid;
+	assign m10_axis_tvalid = s_axis_tvalid && state == 10;
 	assign m10_axis_tlast  = s_axis_tlast;
 
 	assign m11_axis_tdata  = s_axis_tdata;
-	assign m11_axis_tvalid = s_axis_tvalid;
+	assign m11_axis_tvalid = s_axis_tvalid && state == 11;
 	assign m11_axis_tlast  = s_axis_tlast;
 
 	assign m12_axis_tdata  = s_axis_tdata;
-	assign m12_axis_tvalid = s_axis_tvalid;
+	assign m12_axis_tvalid = s_axis_tvalid && state == 12;
 	assign m12_axis_tlast  = s_axis_tlast;
 
 	assign m13_axis_tdata  = s_axis_tdata;
-	assign m13_axis_tvalid = s_axis_tvalid;
+	assign m13_axis_tvalid = s_axis_tvalid && state == 13;
 	assign m13_axis_tlast  = s_axis_tlast;
 
 	assign m14_axis_tdata  = s_axis_tdata;
-	assign m14_axis_tvalid = s_axis_tvalid;
+	assign m14_axis_tvalid = s_axis_tvalid && state == 14;
 	assign m14_axis_tlast  = s_axis_tlast;
 
 	assign m15_axis_tdata  = s_axis_tdata;
-	assign m15_axis_tvalid = s_axis_tvalid;
+	assign m15_axis_tvalid = s_axis_tvalid && state == 15;
 	assign m15_axis_tlast  = s_axis_tlast;
 
 	initial state = 0;
