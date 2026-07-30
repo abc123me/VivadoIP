@@ -143,72 +143,88 @@ module axi_fifo_sequencer # (
 
 	wire last_row;
 	wire last_col;
-	wire last_dat;
+	wire display_tlast;
 	assign last_row = row_counter >= (DISPLAY_ROWS - 1);
 	assign last_col = col_counter >= (DISPLAY_COLS - 1);
 	assign display_tlast = last_row && last_col;
 
 	assign m00_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m00_axis_tvalid = actual_tvalid && display == 00;
 	assign m00_axis_tlast  = tlast_enable  && (tlasts[00] || (display == 00 && display_tlast));
 
 	assign m01_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m01_axis_tvalid = actual_tvalid && display == 01;
 	assign m01_axis_tlast  = tlast_enable  && (tlasts[01] || (display == 01 && display_tlast));
 
 	assign m02_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m02_axis_tvalid = actual_tvalid && display == 02;
 	assign m02_axis_tlast  = tlast_enable  && (tlasts[02] || (display == 02 && display_tlast));
 
 	assign m03_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m03_axis_tvalid = actual_tvalid && display == 03;
 	assign m03_axis_tlast  = tlast_enable  && (tlasts[03] || (display == 03 && display_tlast));
 
 	assign m04_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m04_axis_tvalid = actual_tvalid && display == 04;
 	assign m04_axis_tlast  = tlast_enable  && (tlasts[04] || (display == 04 && display_tlast));
 
 	assign m05_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m05_axis_tvalid = actual_tvalid && display == 05;
 	assign m05_axis_tlast  = tlast_enable  && (tlasts[05] || (display == 05 && display_tlast));
 
 	assign m06_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m06_axis_tvalid = actual_tvalid && display == 06;
 	assign m06_axis_tlast  = tlast_enable  && (tlasts[06] || (display == 06 && display_tlast));
 
 	assign m07_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m07_axis_tvalid = actual_tvalid && display == 07;
 	assign m07_axis_tlast  = tlast_enable  && (tlasts[07] || (display == 07 && display_tlast));
 
 	assign m08_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m08_axis_tvalid = actual_tvalid && display == 08;
 	assign m08_axis_tlast  = tlast_enable  && (tlasts[08] || (display == 08 && display_tlast));
 
 	assign m09_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m09_axis_tvalid = actual_tvalid && display == 09;
 	assign m09_axis_tlast  = tlast_enable  && (tlasts[09] || (display == 09 && display_tlast));
 
 	assign m10_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m10_axis_tvalid = actual_tvalid && display == 10;
 	assign m10_axis_tlast  = tlast_enable  && (tlasts[10] || (display == 10 && display_tlast));
 
 	assign m11_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m11_axis_tvalid = actual_tvalid && display == 11;
 	assign m11_axis_tlast  = tlast_enable  && (tlasts[11] || (display == 11 && display_tlast));
 
 	assign m12_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m12_axis_tvalid = actual_tvalid && display == 12;
 	assign m12_axis_tlast  = tlast_enable  && (tlasts[12] || (display == 12 && display_tlast));
 
 	assign m13_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m13_axis_tvalid = actual_tvalid && display == 13;
 	assign m13_axis_tlast  = tlast_enable  && (tlasts[13] || (display == 13 && display_tlast));
 
 	assign m14_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m14_axis_tvalid = actual_tvalid && display == 14;
 	assign m14_axis_tlast  = tlast_enable  && (tlasts[14] || (display == 14 && display_tlast));
 
 	assign m15_axis_tdata  = s_axis_tdata;
+	/* verilator lint_off WIDTHEXPAND */
 	assign m15_axis_tvalid = actual_tvalid && display == 15;
 	assign m15_axis_tlast  = tlast_enable  && (tlasts[15] || (display == 15 && display_tlast));
 
@@ -237,14 +253,20 @@ module axi_fifo_sequencer # (
 	localparam STATE_WAIT_TVALID   = 2'b11;
 	initial state = STATE_SENDING_DATA;
 
-	assign s_axis_tready = treadies[display] && resetn && state == STATE_SENDING_DATA;
-	assign read_enables  = (state == STATE_SENDING_DATA) ? (16'b1 << display) : 0;
+	wire sending_data;
+	assign sending_data = resetn && state == STATE_SENDING_DATA;
+
+	/* verilator lint_off WIDTHEXPAND */
+	assign s_axis_tready = treadies[display] && sending_data;
+	/* verilator lint_off WIDTHTRUNC */
+	assign read_enables  = sending_data ? (16'b1 << display) : 0;
 
 	always @(posedge axis_clock) begin
 		if (resetn) begin
 			case (state)
 				STATE_SENDING_DATA: begin
 					if (s_axis_tvalid && s_axis_tready) begin
+						/* verilator lint_off WIDTHTRUNC */
 						tlasts[display] <= display_tlast;
 						if (last_col) begin
 							state <= STATE_NEXT_DISPLAY;
