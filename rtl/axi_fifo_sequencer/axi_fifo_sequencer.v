@@ -114,18 +114,19 @@ module axi_fifo_sequencer # (
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TLAST" *)  input  wire s_axis_tlast,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TVALID" *) input  wire s_axis_tvalid,
 		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TDATA" *)  input  wire [DATA_WIDTH-1:0] s_axis_tdata,
-		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output wire s_axis_tready,
-
-		output reg  [1:0]  state,
-		output reg  [$clog2(MAX_DISPLAYS)-1:0] display,
-		output reg  [15:0] col_counter,
-		output reg  [15:0] row_counter,
-		output reg  [15:0] tlasts
+		(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 S_AXIS TREADY" *) output wire s_axis_tready
 	);
 
+	reg [$clog2(MAX_DISPLAYS)-1:0] display;
 	initial display = 0;
+
+	reg [$clog2(DISPLAY_COLS)-1:0] col_counter;
 	initial col_counter = 0;
+
+	reg [$clog2(DISPLAY_ROWS)-1:0] row_counter;
 	initial row_counter = 0;
+
+	reg [15:0] tlasts;
 	initial tlasts = 0;
 
 	reg manual_resetn;
@@ -229,6 +230,7 @@ module axi_fifo_sequencer # (
 	assign treadies[14] = m14_axis_tready;
 	assign treadies[15] = m15_axis_tready;
 
+	reg [1:0] state;
 	localparam STATE_SENDING_DATA  = 2'b00;
 	localparam STATE_NEXT_DISPLAY  = 2'b01;
 	localparam STATE_WAIT_COMPLETE = 2'b10;
